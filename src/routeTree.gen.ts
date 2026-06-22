@@ -9,38 +9,137 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppTimeTrackingRouteImport } from './routes/_app.time-tracking'
+import { Route as AppTimeHistoryRouteImport } from './routes/_app.time-history'
+import { Route as AppSchedulesRouteImport } from './routes/_app.schedules'
+import { Route as AppScheduleRequestsRouteImport } from './routes/_app.schedule-requests'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppTimeTrackingRoute = AppTimeTrackingRouteImport.update({
+  id: '/time-tracking',
+  path: '/time-tracking',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTimeHistoryRoute = AppTimeHistoryRouteImport.update({
+  id: '/time-history',
+  path: '/time-history',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSchedulesRoute = AppSchedulesRouteImport.update({
+  id: '/schedules',
+  path: '/schedules',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppScheduleRequestsRoute = AppScheduleRequestsRouteImport.update({
+  id: '/schedule-requests',
+  path: '/schedule-requests',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/schedule-requests': typeof AppScheduleRequestsRoute
+  '/schedules': typeof AppSchedulesRoute
+  '/time-history': typeof AppTimeHistoryRoute
+  '/time-tracking': typeof AppTimeTrackingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/schedule-requests': typeof AppScheduleRequestsRoute
+  '/schedules': typeof AppSchedulesRoute
+  '/time-history': typeof AppTimeHistoryRoute
+  '/time-tracking': typeof AppTimeTrackingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/schedule-requests': typeof AppScheduleRequestsRoute
+  '/_app/schedules': typeof AppSchedulesRoute
+  '/_app/time-history': typeof AppTimeHistoryRoute
+  '/_app/time-tracking': typeof AppTimeTrackingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/schedule-requests'
+    | '/schedules'
+    | '/time-history'
+    | '/time-tracking'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/schedule-requests'
+    | '/schedules'
+    | '/time-history'
+    | '/time-tracking'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/login'
+    | '/_app/dashboard'
+    | '/_app/schedule-requests'
+    | '/_app/schedules'
+    | '/_app/time-history'
+    | '/_app/time-tracking'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +147,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/time-tracking': {
+      id: '/_app/time-tracking'
+      path: '/time-tracking'
+      fullPath: '/time-tracking'
+      preLoaderRoute: typeof AppTimeTrackingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/time-history': {
+      id: '/_app/time-history'
+      path: '/time-history'
+      fullPath: '/time-history'
+      preLoaderRoute: typeof AppTimeHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/schedules': {
+      id: '/_app/schedules'
+      path: '/schedules'
+      fullPath: '/schedules'
+      preLoaderRoute: typeof AppSchedulesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/schedule-requests': {
+      id: '/_app/schedule-requests'
+      path: '/schedule-requests'
+      fullPath: '/schedule-requests'
+      preLoaderRoute: typeof AppScheduleRequestsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppScheduleRequestsRoute: typeof AppScheduleRequestsRoute
+  AppSchedulesRoute: typeof AppSchedulesRoute
+  AppTimeHistoryRoute: typeof AppTimeHistoryRoute
+  AppTimeTrackingRoute: typeof AppTimeTrackingRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppDashboardRoute: AppDashboardRoute,
+  AppScheduleRequestsRoute: AppScheduleRequestsRoute,
+  AppSchedulesRoute: AppSchedulesRoute,
+  AppTimeHistoryRoute: AppTimeHistoryRoute,
+  AppTimeTrackingRoute: AppTimeTrackingRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
