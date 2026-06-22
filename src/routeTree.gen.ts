@@ -17,6 +17,7 @@ import { Route as AppTimeHistoryRouteImport } from './routes/_app.time-history'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppSchedulesRouteImport } from './routes/_app.schedules'
 import { Route as AppScheduleRequestsRouteImport } from './routes/_app.schedule-requests'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppPerformanceRouteImport } from './routes/_app.performance'
 import { Route as AppNotificationsRouteImport } from './routes/_app.notifications'
 import { Route as AppEodReportsRouteImport } from './routes/_app.eod-reports'
@@ -62,6 +63,11 @@ const AppScheduleRequestsRoute = AppScheduleRequestsRouteImport.update({
   path: '/schedule-requests',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPerformanceRoute = AppPerformanceRouteImport.update({
   id: '/performance',
   path: '/performance',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/eod-reports': typeof AppEodReportsRoute
   '/notifications': typeof AppNotificationsRoute
   '/performance': typeof AppPerformanceRoute
+  '/profile': typeof AppProfileRoute
   '/schedule-requests': typeof AppScheduleRequestsRoute
   '/schedules': typeof AppSchedulesRoute
   '/settings': typeof AppSettingsRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/eod-reports': typeof AppEodReportsRoute
   '/notifications': typeof AppNotificationsRoute
   '/performance': typeof AppPerformanceRoute
+  '/profile': typeof AppProfileRoute
   '/schedule-requests': typeof AppScheduleRequestsRoute
   '/schedules': typeof AppSchedulesRoute
   '/settings': typeof AppSettingsRoute
@@ -126,6 +134,7 @@ export interface FileRoutesById {
   '/_app/eod-reports': typeof AppEodReportsRoute
   '/_app/notifications': typeof AppNotificationsRoute
   '/_app/performance': typeof AppPerformanceRoute
+  '/_app/profile': typeof AppProfileRoute
   '/_app/schedule-requests': typeof AppScheduleRequestsRoute
   '/_app/schedules': typeof AppSchedulesRoute
   '/_app/settings': typeof AppSettingsRoute
@@ -142,6 +151,7 @@ export interface FileRouteTypes {
     | '/eod-reports'
     | '/notifications'
     | '/performance'
+    | '/profile'
     | '/schedule-requests'
     | '/schedules'
     | '/settings'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/eod-reports'
     | '/notifications'
     | '/performance'
+    | '/profile'
     | '/schedule-requests'
     | '/schedules'
     | '/settings'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/_app/eod-reports'
     | '/_app/notifications'
     | '/_app/performance'
+    | '/_app/profile'
     | '/_app/schedule-requests'
     | '/_app/schedules'
     | '/_app/settings'
@@ -242,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppScheduleRequestsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/performance': {
       id: '/_app/performance'
       path: '/performance'
@@ -286,6 +305,7 @@ interface AppRouteChildren {
   AppEodReportsRoute: typeof AppEodReportsRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppPerformanceRoute: typeof AppPerformanceRoute
+  AppProfileRoute: typeof AppProfileRoute
   AppScheduleRequestsRoute: typeof AppScheduleRequestsRoute
   AppSchedulesRoute: typeof AppSchedulesRoute
   AppSettingsRoute: typeof AppSettingsRoute
@@ -299,6 +319,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppEodReportsRoute: AppEodReportsRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppPerformanceRoute: AppPerformanceRoute,
+  AppProfileRoute: AppProfileRoute,
   AppScheduleRequestsRoute: AppScheduleRequestsRoute,
   AppSchedulesRoute: AppSchedulesRoute,
   AppSettingsRoute: AppSettingsRoute,
