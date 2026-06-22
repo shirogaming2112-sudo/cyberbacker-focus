@@ -29,6 +29,7 @@ import { Route as AppAdminUserSchedulesRouteImport } from './routes/_app.admin.u
 import { Route as AppAdminUserAttendanceRouteImport } from './routes/_app.admin.user-attendance'
 import { Route as AppAdminScheduleApprovalsRouteImport } from './routes/_app.admin.schedule-approvals'
 import { Route as AppAdminChangeLogsRouteImport } from './routes/_app.admin.change-logs'
+import { Route as AppAdminAttendanceSummaryRouteImport } from './routes/_app.admin.attendance-summary'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -130,6 +131,12 @@ const AppAdminChangeLogsRoute = AppAdminChangeLogsRouteImport.update({
   path: '/change-logs',
   getParentRoute: () => AppAdminRoute,
 } as any)
+const AppAdminAttendanceSummaryRoute =
+  AppAdminAttendanceSummaryRouteImport.update({
+    id: '/attendance-summary',
+    path: '/attendance-summary',
+    getParentRoute: () => AppAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/time-history': typeof AppTimeHistoryRoute
   '/time-tracking': typeof AppTimeTrackingRoute
+  '/admin/attendance-summary': typeof AppAdminAttendanceSummaryRoute
   '/admin/change-logs': typeof AppAdminChangeLogsRoute
   '/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/admin/user-attendance': typeof AppAdminUserAttendanceRoute
@@ -166,6 +174,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/time-history': typeof AppTimeHistoryRoute
   '/time-tracking': typeof AppTimeTrackingRoute
+  '/admin/attendance-summary': typeof AppAdminAttendanceSummaryRoute
   '/admin/change-logs': typeof AppAdminChangeLogsRoute
   '/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/admin/user-attendance': typeof AppAdminUserAttendanceRoute
@@ -189,6 +198,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/time-history': typeof AppTimeHistoryRoute
   '/_app/time-tracking': typeof AppTimeTrackingRoute
+  '/_app/admin/attendance-summary': typeof AppAdminAttendanceSummaryRoute
   '/_app/admin/change-logs': typeof AppAdminChangeLogsRoute
   '/_app/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/_app/admin/user-attendance': typeof AppAdminUserAttendanceRoute
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/time-history'
     | '/time-tracking'
+    | '/admin/attendance-summary'
     | '/admin/change-logs'
     | '/admin/schedule-approvals'
     | '/admin/user-attendance'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/time-history'
     | '/time-tracking'
+    | '/admin/attendance-summary'
     | '/admin/change-logs'
     | '/admin/schedule-approvals'
     | '/admin/user-attendance'
@@ -254,6 +266,7 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/time-history'
     | '/_app/time-tracking'
+    | '/_app/admin/attendance-summary'
     | '/_app/admin/change-logs'
     | '/_app/admin/schedule-approvals'
     | '/_app/admin/user-attendance'
@@ -409,10 +422,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminChangeLogsRouteImport
       parentRoute: typeof AppAdminRoute
     }
+    '/_app/admin/attendance-summary': {
+      id: '/_app/admin/attendance-summary'
+      path: '/attendance-summary'
+      fullPath: '/admin/attendance-summary'
+      preLoaderRoute: typeof AppAdminAttendanceSummaryRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
   }
 }
 
 interface AppAdminRouteChildren {
+  AppAdminAttendanceSummaryRoute: typeof AppAdminAttendanceSummaryRoute
   AppAdminChangeLogsRoute: typeof AppAdminChangeLogsRoute
   AppAdminScheduleApprovalsRoute: typeof AppAdminScheduleApprovalsRoute
   AppAdminUserAttendanceRoute: typeof AppAdminUserAttendanceRoute
@@ -421,6 +442,7 @@ interface AppAdminRouteChildren {
 }
 
 const AppAdminRouteChildren: AppAdminRouteChildren = {
+  AppAdminAttendanceSummaryRoute: AppAdminAttendanceSummaryRoute,
   AppAdminChangeLogsRoute: AppAdminChangeLogsRoute,
   AppAdminScheduleApprovalsRoute: AppAdminScheduleApprovalsRoute,
   AppAdminUserAttendanceRoute: AppAdminUserAttendanceRoute,
