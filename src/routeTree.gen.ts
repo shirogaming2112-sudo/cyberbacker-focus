@@ -16,6 +16,7 @@ import { Route as AppTimeTrackingRouteImport } from './routes/_app.time-tracking
 import { Route as AppTimeHistoryRouteImport } from './routes/_app.time-history'
 import { Route as AppSchedulesRouteImport } from './routes/_app.schedules'
 import { Route as AppScheduleRequestsRouteImport } from './routes/_app.schedule-requests'
+import { Route as AppEodReportsRouteImport } from './routes/_app.eod-reports'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 
 const LoginRoute = LoginRouteImport.update({
@@ -52,6 +53,11 @@ const AppScheduleRequestsRoute = AppScheduleRequestsRouteImport.update({
   path: '/schedule-requests',
   getParentRoute: () => AppRoute,
 } as any)
+const AppEodReportsRoute = AppEodReportsRouteImport.update({
+  id: '/eod-reports',
+  path: '/eod-reports',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -62,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AppDashboardRoute
+  '/eod-reports': typeof AppEodReportsRoute
   '/schedule-requests': typeof AppScheduleRequestsRoute
   '/schedules': typeof AppSchedulesRoute
   '/time-history': typeof AppTimeHistoryRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AppDashboardRoute
+  '/eod-reports': typeof AppEodReportsRoute
   '/schedule-requests': typeof AppScheduleRequestsRoute
   '/schedules': typeof AppSchedulesRoute
   '/time-history': typeof AppTimeHistoryRoute
@@ -82,6 +90,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/eod-reports': typeof AppEodReportsRoute
   '/_app/schedule-requests': typeof AppScheduleRequestsRoute
   '/_app/schedules': typeof AppSchedulesRoute
   '/_app/time-history': typeof AppTimeHistoryRoute
@@ -93,6 +102,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/dashboard'
+    | '/eod-reports'
     | '/schedule-requests'
     | '/schedules'
     | '/time-history'
@@ -102,6 +112,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/dashboard'
+    | '/eod-reports'
     | '/schedule-requests'
     | '/schedules'
     | '/time-history'
@@ -112,6 +123,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/login'
     | '/_app/dashboard'
+    | '/_app/eod-reports'
     | '/_app/schedule-requests'
     | '/_app/schedules'
     | '/_app/time-history'
@@ -175,6 +187,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppScheduleRequestsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/eod-reports': {
+      id: '/_app/eod-reports'
+      path: '/eod-reports'
+      fullPath: '/eod-reports'
+      preLoaderRoute: typeof AppEodReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -187,6 +206,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
+  AppEodReportsRoute: typeof AppEodReportsRoute
   AppScheduleRequestsRoute: typeof AppScheduleRequestsRoute
   AppSchedulesRoute: typeof AppSchedulesRoute
   AppTimeHistoryRoute: typeof AppTimeHistoryRoute
@@ -195,6 +215,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
+  AppEodReportsRoute: AppEodReportsRoute,
   AppScheduleRequestsRoute: AppScheduleRequestsRoute,
   AppSchedulesRoute: AppSchedulesRoute,
   AppTimeHistoryRoute: AppTimeHistoryRoute,
