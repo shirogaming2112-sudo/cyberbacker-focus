@@ -9,38 +9,305 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppTimeTrackingRouteImport } from './routes/_app.time-tracking'
+import { Route as AppTimeHistoryRouteImport } from './routes/_app.time-history'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppSchedulesRouteImport } from './routes/_app.schedules'
+import { Route as AppScheduleRequestsRouteImport } from './routes/_app.schedule-requests'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
+import { Route as AppPerformanceRouteImport } from './routes/_app.performance'
+import { Route as AppNotificationsRouteImport } from './routes/_app.notifications'
+import { Route as AppEodReportsRouteImport } from './routes/_app.eod-reports'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppClientsRouteImport } from './routes/_app.clients'
+import { Route as AppAdminRouteImport } from './routes/_app.admin'
+import { Route as AppAdminIndexRouteImport } from './routes/_app.admin.index'
+import { Route as AppAdminUsersRouteImport } from './routes/_app.admin.users'
+import { Route as AppAdminUserSchedulesRouteImport } from './routes/_app.admin.user-schedules'
+import { Route as AppAdminUserAttendanceRouteImport } from './routes/_app.admin.user-attendance'
+import { Route as AppAdminScheduleApprovalsRouteImport } from './routes/_app.admin.schedule-approvals'
+import { Route as AppAdminChangeLogsRouteImport } from './routes/_app.admin.change-logs'
+import { Route as AppAdminAttendanceSummaryRouteImport } from './routes/_app.admin.attendance-summary'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppTimeTrackingRoute = AppTimeTrackingRouteImport.update({
+  id: '/time-tracking',
+  path: '/time-tracking',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTimeHistoryRoute = AppTimeHistoryRouteImport.update({
+  id: '/time-history',
+  path: '/time-history',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSchedulesRoute = AppSchedulesRouteImport.update({
+  id: '/schedules',
+  path: '/schedules',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppScheduleRequestsRoute = AppScheduleRequestsRouteImport.update({
+  id: '/schedule-requests',
+  path: '/schedule-requests',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPerformanceRoute = AppPerformanceRouteImport.update({
+  id: '/performance',
+  path: '/performance',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEodReportsRoute = AppEodReportsRouteImport.update({
+  id: '/eod-reports',
+  path: '/eod-reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppClientsRoute = AppClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminUserSchedulesRoute = AppAdminUserSchedulesRouteImport.update({
+  id: '/user-schedules',
+  path: '/user-schedules',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminUserAttendanceRoute = AppAdminUserAttendanceRouteImport.update({
+  id: '/user-attendance',
+  path: '/user-attendance',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminScheduleApprovalsRoute =
+  AppAdminScheduleApprovalsRouteImport.update({
+    id: '/schedule-approvals',
+    path: '/schedule-approvals',
+    getParentRoute: () => AppAdminRoute,
+  } as any)
+const AppAdminChangeLogsRoute = AppAdminChangeLogsRouteImport.update({
+  id: '/change-logs',
+  path: '/change-logs',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminAttendanceSummaryRoute =
+  AppAdminAttendanceSummaryRouteImport.update({
+    id: '/attendance-summary',
+    path: '/attendance-summary',
+    getParentRoute: () => AppAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/admin': typeof AppAdminRouteWithChildren
+  '/clients': typeof AppClientsRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/eod-reports': typeof AppEodReportsRoute
+  '/notifications': typeof AppNotificationsRoute
+  '/performance': typeof AppPerformanceRoute
+  '/profile': typeof AppProfileRoute
+  '/schedule-requests': typeof AppScheduleRequestsRoute
+  '/schedules': typeof AppSchedulesRoute
+  '/settings': typeof AppSettingsRoute
+  '/time-history': typeof AppTimeHistoryRoute
+  '/time-tracking': typeof AppTimeTrackingRoute
+  '/admin/attendance-summary': typeof AppAdminAttendanceSummaryRoute
+  '/admin/change-logs': typeof AppAdminChangeLogsRoute
+  '/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
+  '/admin/user-attendance': typeof AppAdminUserAttendanceRoute
+  '/admin/user-schedules': typeof AppAdminUserSchedulesRoute
+  '/admin/users': typeof AppAdminUsersRoute
+  '/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/clients': typeof AppClientsRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/eod-reports': typeof AppEodReportsRoute
+  '/notifications': typeof AppNotificationsRoute
+  '/performance': typeof AppPerformanceRoute
+  '/profile': typeof AppProfileRoute
+  '/schedule-requests': typeof AppScheduleRequestsRoute
+  '/schedules': typeof AppSchedulesRoute
+  '/settings': typeof AppSettingsRoute
+  '/time-history': typeof AppTimeHistoryRoute
+  '/time-tracking': typeof AppTimeTrackingRoute
+  '/admin/attendance-summary': typeof AppAdminAttendanceSummaryRoute
+  '/admin/change-logs': typeof AppAdminChangeLogsRoute
+  '/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
+  '/admin/user-attendance': typeof AppAdminUserAttendanceRoute
+  '/admin/user-schedules': typeof AppAdminUserSchedulesRoute
+  '/admin/users': typeof AppAdminUsersRoute
+  '/admin': typeof AppAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_app/admin': typeof AppAdminRouteWithChildren
+  '/_app/clients': typeof AppClientsRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/eod-reports': typeof AppEodReportsRoute
+  '/_app/notifications': typeof AppNotificationsRoute
+  '/_app/performance': typeof AppPerformanceRoute
+  '/_app/profile': typeof AppProfileRoute
+  '/_app/schedule-requests': typeof AppScheduleRequestsRoute
+  '/_app/schedules': typeof AppSchedulesRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/time-history': typeof AppTimeHistoryRoute
+  '/_app/time-tracking': typeof AppTimeTrackingRoute
+  '/_app/admin/attendance-summary': typeof AppAdminAttendanceSummaryRoute
+  '/_app/admin/change-logs': typeof AppAdminChangeLogsRoute
+  '/_app/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
+  '/_app/admin/user-attendance': typeof AppAdminUserAttendanceRoute
+  '/_app/admin/user-schedules': typeof AppAdminUserSchedulesRoute
+  '/_app/admin/users': typeof AppAdminUsersRoute
+  '/_app/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/admin'
+    | '/clients'
+    | '/dashboard'
+    | '/eod-reports'
+    | '/notifications'
+    | '/performance'
+    | '/profile'
+    | '/schedule-requests'
+    | '/schedules'
+    | '/settings'
+    | '/time-history'
+    | '/time-tracking'
+    | '/admin/attendance-summary'
+    | '/admin/change-logs'
+    | '/admin/schedule-approvals'
+    | '/admin/user-attendance'
+    | '/admin/user-schedules'
+    | '/admin/users'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/clients'
+    | '/dashboard'
+    | '/eod-reports'
+    | '/notifications'
+    | '/performance'
+    | '/profile'
+    | '/schedule-requests'
+    | '/schedules'
+    | '/settings'
+    | '/time-history'
+    | '/time-tracking'
+    | '/admin/attendance-summary'
+    | '/admin/change-logs'
+    | '/admin/schedule-approvals'
+    | '/admin/user-attendance'
+    | '/admin/user-schedules'
+    | '/admin/users'
+    | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/login'
+    | '/_app/admin'
+    | '/_app/clients'
+    | '/_app/dashboard'
+    | '/_app/eod-reports'
+    | '/_app/notifications'
+    | '/_app/performance'
+    | '/_app/profile'
+    | '/_app/schedule-requests'
+    | '/_app/schedules'
+    | '/_app/settings'
+    | '/_app/time-history'
+    | '/_app/time-tracking'
+    | '/_app/admin/attendance-summary'
+    | '/_app/admin/change-logs'
+    | '/_app/admin/schedule-approvals'
+    | '/_app/admin/user-attendance'
+    | '/_app/admin/user-schedules'
+    | '/_app/admin/users'
+    | '/_app/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +315,203 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/time-tracking': {
+      id: '/_app/time-tracking'
+      path: '/time-tracking'
+      fullPath: '/time-tracking'
+      preLoaderRoute: typeof AppTimeTrackingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/time-history': {
+      id: '/_app/time-history'
+      path: '/time-history'
+      fullPath: '/time-history'
+      preLoaderRoute: typeof AppTimeHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/schedules': {
+      id: '/_app/schedules'
+      path: '/schedules'
+      fullPath: '/schedules'
+      preLoaderRoute: typeof AppSchedulesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/schedule-requests': {
+      id: '/_app/schedule-requests'
+      path: '/schedule-requests'
+      fullPath: '/schedule-requests'
+      preLoaderRoute: typeof AppScheduleRequestsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/performance': {
+      id: '/_app/performance'
+      path: '/performance'
+      fullPath: '/performance'
+      preLoaderRoute: typeof AppPerformanceRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/notifications': {
+      id: '/_app/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/eod-reports': {
+      id: '/_app/eod-reports'
+      path: '/eod-reports'
+      fullPath: '/eod-reports'
+      preLoaderRoute: typeof AppEodReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/clients': {
+      id: '/_app/clients'
+      path: '/clients'
+      fullPath: '/clients'
+      preLoaderRoute: typeof AppClientsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin/': {
+      id: '/_app/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AppAdminIndexRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/users': {
+      id: '/_app/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AppAdminUsersRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/user-schedules': {
+      id: '/_app/admin/user-schedules'
+      path: '/user-schedules'
+      fullPath: '/admin/user-schedules'
+      preLoaderRoute: typeof AppAdminUserSchedulesRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/user-attendance': {
+      id: '/_app/admin/user-attendance'
+      path: '/user-attendance'
+      fullPath: '/admin/user-attendance'
+      preLoaderRoute: typeof AppAdminUserAttendanceRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/schedule-approvals': {
+      id: '/_app/admin/schedule-approvals'
+      path: '/schedule-approvals'
+      fullPath: '/admin/schedule-approvals'
+      preLoaderRoute: typeof AppAdminScheduleApprovalsRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/change-logs': {
+      id: '/_app/admin/change-logs'
+      path: '/change-logs'
+      fullPath: '/admin/change-logs'
+      preLoaderRoute: typeof AppAdminChangeLogsRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/attendance-summary': {
+      id: '/_app/admin/attendance-summary'
+      path: '/attendance-summary'
+      fullPath: '/admin/attendance-summary'
+      preLoaderRoute: typeof AppAdminAttendanceSummaryRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
   }
 }
 
+interface AppAdminRouteChildren {
+  AppAdminAttendanceSummaryRoute: typeof AppAdminAttendanceSummaryRoute
+  AppAdminChangeLogsRoute: typeof AppAdminChangeLogsRoute
+  AppAdminScheduleApprovalsRoute: typeof AppAdminScheduleApprovalsRoute
+  AppAdminUserAttendanceRoute: typeof AppAdminUserAttendanceRoute
+  AppAdminUserSchedulesRoute: typeof AppAdminUserSchedulesRoute
+  AppAdminUsersRoute: typeof AppAdminUsersRoute
+  AppAdminIndexRoute: typeof AppAdminIndexRoute
+}
+
+const AppAdminRouteChildren: AppAdminRouteChildren = {
+  AppAdminAttendanceSummaryRoute: AppAdminAttendanceSummaryRoute,
+  AppAdminChangeLogsRoute: AppAdminChangeLogsRoute,
+  AppAdminScheduleApprovalsRoute: AppAdminScheduleApprovalsRoute,
+  AppAdminUserAttendanceRoute: AppAdminUserAttendanceRoute,
+  AppAdminUserSchedulesRoute: AppAdminUserSchedulesRoute,
+  AppAdminUsersRoute: AppAdminUsersRoute,
+  AppAdminIndexRoute: AppAdminIndexRoute,
+}
+
+const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
+  AppAdminRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRouteWithChildren
+  AppClientsRoute: typeof AppClientsRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppEodReportsRoute: typeof AppEodReportsRoute
+  AppNotificationsRoute: typeof AppNotificationsRoute
+  AppPerformanceRoute: typeof AppPerformanceRoute
+  AppProfileRoute: typeof AppProfileRoute
+  AppScheduleRequestsRoute: typeof AppScheduleRequestsRoute
+  AppSchedulesRoute: typeof AppSchedulesRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppTimeHistoryRoute: typeof AppTimeHistoryRoute
+  AppTimeTrackingRoute: typeof AppTimeTrackingRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRouteWithChildren,
+  AppClientsRoute: AppClientsRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppEodReportsRoute: AppEodReportsRoute,
+  AppNotificationsRoute: AppNotificationsRoute,
+  AppPerformanceRoute: AppPerformanceRoute,
+  AppProfileRoute: AppProfileRoute,
+  AppScheduleRequestsRoute: AppScheduleRequestsRoute,
+  AppSchedulesRoute: AppSchedulesRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppTimeHistoryRoute: AppTimeHistoryRoute,
+  AppTimeTrackingRoute: AppTimeTrackingRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
