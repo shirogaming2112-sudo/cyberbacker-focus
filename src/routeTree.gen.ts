@@ -23,6 +23,7 @@ import { Route as AppNotificationsRouteImport } from './routes/_app.notification
 import { Route as AppEodReportsRouteImport } from './routes/_app.eod-reports'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppClientsRouteImport } from './routes/_app.clients'
+import { Route as AppAdminIndexRouteImport } from './routes/_app.admin.index'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -93,6 +94,11 @@ const AppClientsRoute = AppClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/time-history': typeof AppTimeHistoryRoute
   '/time-tracking': typeof AppTimeTrackingRoute
+  '/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/time-history': typeof AppTimeHistoryRoute
   '/time-tracking': typeof AppTimeTrackingRoute
+  '/admin': typeof AppAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/time-history': typeof AppTimeHistoryRoute
   '/_app/time-tracking': typeof AppTimeTrackingRoute
+  '/_app/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/time-history'
     | '/time-tracking'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/time-history'
     | '/time-tracking'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/time-history'
     | '/_app/time-tracking'
+    | '/_app/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -296,6 +308,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClientsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/admin/': {
+      id: '/_app/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AppAdminIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -311,6 +330,7 @@ interface AppRouteChildren {
   AppSettingsRoute: typeof AppSettingsRoute
   AppTimeHistoryRoute: typeof AppTimeHistoryRoute
   AppTimeTrackingRoute: typeof AppTimeTrackingRoute
+  AppAdminIndexRoute: typeof AppAdminIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -325,6 +345,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppSettingsRoute: AppSettingsRoute,
   AppTimeHistoryRoute: AppTimeHistoryRoute,
   AppTimeTrackingRoute: AppTimeTrackingRoute,
+  AppAdminIndexRoute: AppAdminIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
