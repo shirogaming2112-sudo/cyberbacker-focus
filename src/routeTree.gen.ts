@@ -16,6 +16,7 @@ import { Route as AppTimeTrackingRouteImport } from './routes/_app.time-tracking
 import { Route as AppTimeHistoryRouteImport } from './routes/_app.time-history'
 import { Route as AppSchedulesRouteImport } from './routes/_app.schedules'
 import { Route as AppScheduleRequestsRouteImport } from './routes/_app.schedule-requests'
+import { Route as AppPerformanceRouteImport } from './routes/_app.performance'
 import { Route as AppEodReportsRouteImport } from './routes/_app.eod-reports'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppClientsRouteImport } from './routes/_app.clients'
@@ -54,6 +55,11 @@ const AppScheduleRequestsRoute = AppScheduleRequestsRouteImport.update({
   path: '/schedule-requests',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPerformanceRoute = AppPerformanceRouteImport.update({
+  id: '/performance',
+  path: '/performance',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppEodReportsRoute = AppEodReportsRouteImport.update({
   id: '/eod-reports',
   path: '/eod-reports',
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/clients': typeof AppClientsRoute
   '/dashboard': typeof AppDashboardRoute
   '/eod-reports': typeof AppEodReportsRoute
+  '/performance': typeof AppPerformanceRoute
   '/schedule-requests': typeof AppScheduleRequestsRoute
   '/schedules': typeof AppSchedulesRoute
   '/time-history': typeof AppTimeHistoryRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/clients': typeof AppClientsRoute
   '/dashboard': typeof AppDashboardRoute
   '/eod-reports': typeof AppEodReportsRoute
+  '/performance': typeof AppPerformanceRoute
   '/schedule-requests': typeof AppScheduleRequestsRoute
   '/schedules': typeof AppSchedulesRoute
   '/time-history': typeof AppTimeHistoryRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/_app/clients': typeof AppClientsRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/eod-reports': typeof AppEodReportsRoute
+  '/_app/performance': typeof AppPerformanceRoute
   '/_app/schedule-requests': typeof AppScheduleRequestsRoute
   '/_app/schedules': typeof AppSchedulesRoute
   '/_app/time-history': typeof AppTimeHistoryRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/eod-reports'
+    | '/performance'
     | '/schedule-requests'
     | '/schedules'
     | '/time-history'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/eod-reports'
+    | '/performance'
     | '/schedule-requests'
     | '/schedules'
     | '/time-history'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/_app/clients'
     | '/_app/dashboard'
     | '/_app/eod-reports'
+    | '/_app/performance'
     | '/_app/schedule-requests'
     | '/_app/schedules'
     | '/_app/time-history'
@@ -199,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppScheduleRequestsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/performance': {
+      id: '/_app/performance'
+      path: '/performance'
+      fullPath: '/performance'
+      preLoaderRoute: typeof AppPerformanceRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/eod-reports': {
       id: '/_app/eod-reports'
       path: '/eod-reports'
@@ -227,6 +246,7 @@ interface AppRouteChildren {
   AppClientsRoute: typeof AppClientsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppEodReportsRoute: typeof AppEodReportsRoute
+  AppPerformanceRoute: typeof AppPerformanceRoute
   AppScheduleRequestsRoute: typeof AppScheduleRequestsRoute
   AppSchedulesRoute: typeof AppSchedulesRoute
   AppTimeHistoryRoute: typeof AppTimeHistoryRoute
@@ -237,6 +257,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppClientsRoute: AppClientsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppEodReportsRoute: AppEodReportsRoute,
+  AppPerformanceRoute: AppPerformanceRoute,
   AppScheduleRequestsRoute: AppScheduleRequestsRoute,
   AppSchedulesRoute: AppSchedulesRoute,
   AppTimeHistoryRoute: AppTimeHistoryRoute,
