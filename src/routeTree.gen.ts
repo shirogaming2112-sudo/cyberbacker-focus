@@ -17,6 +17,7 @@ import { Route as AppTimeHistoryRouteImport } from './routes/_app.time-history'
 import { Route as AppSchedulesRouteImport } from './routes/_app.schedules'
 import { Route as AppScheduleRequestsRouteImport } from './routes/_app.schedule-requests'
 import { Route as AppPerformanceRouteImport } from './routes/_app.performance'
+import { Route as AppNotificationsRouteImport } from './routes/_app.notifications'
 import { Route as AppEodReportsRouteImport } from './routes/_app.eod-reports'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppClientsRouteImport } from './routes/_app.clients'
@@ -60,6 +61,11 @@ const AppPerformanceRoute = AppPerformanceRouteImport.update({
   path: '/performance',
   getParentRoute: () => AppRoute,
 } as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppEodReportsRoute = AppEodReportsRouteImport.update({
   id: '/eod-reports',
   path: '/eod-reports',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/clients': typeof AppClientsRoute
   '/dashboard': typeof AppDashboardRoute
   '/eod-reports': typeof AppEodReportsRoute
+  '/notifications': typeof AppNotificationsRoute
   '/performance': typeof AppPerformanceRoute
   '/schedule-requests': typeof AppScheduleRequestsRoute
   '/schedules': typeof AppSchedulesRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/clients': typeof AppClientsRoute
   '/dashboard': typeof AppDashboardRoute
   '/eod-reports': typeof AppEodReportsRoute
+  '/notifications': typeof AppNotificationsRoute
   '/performance': typeof AppPerformanceRoute
   '/schedule-requests': typeof AppScheduleRequestsRoute
   '/schedules': typeof AppSchedulesRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/_app/clients': typeof AppClientsRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/eod-reports': typeof AppEodReportsRoute
+  '/_app/notifications': typeof AppNotificationsRoute
   '/_app/performance': typeof AppPerformanceRoute
   '/_app/schedule-requests': typeof AppScheduleRequestsRoute
   '/_app/schedules': typeof AppSchedulesRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/eod-reports'
+    | '/notifications'
     | '/performance'
     | '/schedule-requests'
     | '/schedules'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/eod-reports'
+    | '/notifications'
     | '/performance'
     | '/schedule-requests'
     | '/schedules'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
     | '/_app/clients'
     | '/_app/dashboard'
     | '/_app/eod-reports'
+    | '/_app/notifications'
     | '/_app/performance'
     | '/_app/schedule-requests'
     | '/_app/schedules'
@@ -218,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPerformanceRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/notifications': {
+      id: '/_app/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/eod-reports': {
       id: '/_app/eod-reports'
       path: '/eod-reports'
@@ -246,6 +265,7 @@ interface AppRouteChildren {
   AppClientsRoute: typeof AppClientsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppEodReportsRoute: typeof AppEodReportsRoute
+  AppNotificationsRoute: typeof AppNotificationsRoute
   AppPerformanceRoute: typeof AppPerformanceRoute
   AppScheduleRequestsRoute: typeof AppScheduleRequestsRoute
   AppSchedulesRoute: typeof AppSchedulesRoute
@@ -257,6 +277,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppClientsRoute: AppClientsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppEodReportsRoute: AppEodReportsRoute,
+  AppNotificationsRoute: AppNotificationsRoute,
   AppPerformanceRoute: AppPerformanceRoute,
   AppScheduleRequestsRoute: AppScheduleRequestsRoute,
   AppSchedulesRoute: AppSchedulesRoute,
