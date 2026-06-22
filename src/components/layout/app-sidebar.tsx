@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Clock,
@@ -6,8 +6,6 @@ import {
   CalendarDays,
   FileClock,
   FileText,
-  Building2,
-  TrendingUp,
   Bell,
   Settings,
   LogOut,
@@ -18,6 +16,7 @@ import {
   ClipboardList,
   BarChart3,
   CalendarCheck,
+  Ticket,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -37,6 +36,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { currentUser } from "@/mock/data";
+import { useAuth } from "@/lib/auth";
+import { can, ROLE_LABEL } from "@/lib/permissions";
 import logoFull from "@/assets/cyberbacker-full.png.asset.json";
 import logoMark from "@/assets/cyberbacker-mark.png.asset.json";
 import logoWhite from "@/assets/cyberbacker-white.png.asset.json";
@@ -48,47 +49,49 @@ const mainNav = [
   { to: "/schedules", label: "Schedules", icon: CalendarDays },
   { to: "/schedule-requests", label: "Schedule Requests", icon: FileClock },
   { to: "/eod-reports", label: "EOD Reports", icon: FileText },
-  { to: "/clients", label: "Clients", icon: Building2 },
-  { to: "/performance", label: "Performance", icon: TrendingUp },
+  { to: "/tokens", label: "Token Management", icon: Ticket },
   { to: "/notifications", label: "Notifications", icon: Bell },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
-const adminNav = [
+type AdminItem = { to: string; label: string; icon: typeof ShieldCheck; requireSummary?: boolean };
+const adminNav: AdminItem[] = [
   { to: "/admin", label: "Admin Overview", icon: ShieldCheck },
   { to: "/admin/schedule-approvals", label: "Schedule Approvals", icon: CalendarCheck },
+  { to: "/admin/eod-reports", label: "EOD Reviews", icon: FileText },
   { to: "/admin/user-attendance", label: "User Attendance", icon: ClipboardList },
   { to: "/admin/user-schedules", label: "User Schedules", icon: CalendarDays },
   { to: "/admin/change-logs", label: "Change Logs", icon: FileClock },
-  { to: "/admin/attendance-summary", label: "Attendance Summary", icon: BarChart3 },
+  { to: "/admin/attendance-summary", label: "Attendance Summary", icon: BarChart3, requireSummary: true },
   { to: "/admin/users", label: "Users Management", icon: UsersIcon },
-] as const;
+];
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const isActive = (to: string) => pathname === to || pathname.startsWith(to + "/");
+  const { role, logout } = useAuth();
+  const navigate = useNavigate();
+  const isActive = (to: string) =>
+    to === "/admin" ? pathname === "/admin" : pathname === to || pathname.startsWith(to + "/");
+
+  const showAdmin = role && can.viewAdmin(role);
 
   return (
     <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader className="border-b">
-        <Link to="/dashboard" className="flex items-center gap-2 px-2 py-1.5">
+        <Link to="/dashboard" className="flex items-center gap-2 px-2 py-1.5" aria-label="Cyberbacker home">
           {collapsed ? (
-            <img src={logoMark.url} alt="Cyberbacker" className="size-7 object-contain" />
+            <img src={logoMark.url} alt="" className="size-7 object-contain" />
           ) : (
             <>
               <img
                 src={resolvedTheme === "dark" ? logoWhite.url : logoFull.url}
-                alt="Cyberbacker"
+                alt=""
                 className="h-7 w-auto object-contain dark:hidden"
               />
-              <img
-                src={logoWhite.url}
-                alt="Cyberbacker"
-                className="hidden h-7 w-auto object-contain dark:block"
-              />
+              <img src={logoWhite.url} alt="" className="hidden h-7 w-auto object-contain dark:block" />
             </>
           )}
         </Link>
@@ -102,8 +105,8 @@ export function AppSidebar() {
               {mainNav.map((item) => (
                 <SidebarMenuItem key={item.to}>
                   <SidebarMenuButton asChild isActive={isActive(item.to)} tooltip={item.label}>
-                    <Link to={item.to}>
-                      <item.icon />
+                    <Link to={item.to} aria-current={isActive(item.to) ? "page" : undefined}>
+                      <item.icon aria-hidden />
                       <span>{item.label}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -113,21 +116,23 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {currentUser.role === "admin" && (
+        {showAdmin && (
           <SidebarGroup>
             <SidebarGroupLabel>Admin</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {adminNav.map((item) => (
-                  <SidebarMenuItem key={item.to}>
-                    <SidebarMenuButton asChild isActive={isActive(item.to)} tooltip={item.label}>
-                      <Link to={item.to}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {adminNav
+                  .filter((item) => !item.requireSummary || can.viewAttendanceSummary(role!))
+                  .map((item) => (
+                    <SidebarMenuItem key={item.to}>
+                      <SidebarMenuButton asChild isActive={isActive(item.to)} tooltip={item.label}>
+                        <Link to={item.to} aria-current={isActive(item.to) ? "page" : undefined}>
+                          <item.icon aria-hidden />
+                          <span>{item.label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -136,7 +141,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t">
         <div className="flex items-center gap-2 px-1 py-1">
-          <Link to="/profile" className="flex min-w-0 flex-1 items-center gap-2 rounded-md p-1.5 hover:bg-sidebar-accent">
+          <Link to="/profile" className="flex min-w-0 flex-1 items-center gap-2 rounded-md p-1.5 hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <Avatar className="size-8">
               <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
                 {currentUser.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
@@ -145,7 +150,9 @@ export function AppSidebar() {
             {!collapsed && (
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{currentUser.name}</p>
-                <p className="truncate text-xs text-muted-foreground">{currentUser.title}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {role ? ROLE_LABEL[role] : currentUser.title}
+                </p>
               </div>
             )}
           </Link>
@@ -154,15 +161,18 @@ export function AppSidebar() {
               <Button
                 size="icon"
                 variant="ghost"
-                aria-label="Toggle theme"
+                aria-label={resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               >
                 {resolvedTheme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
               </Button>
-              <Button size="icon" variant="ghost" aria-label="Log out" asChild>
-                <Link to="/login">
-                  <LogOut className="size-4" />
-                </Link>
+              <Button
+                size="icon"
+                variant="ghost"
+                aria-label="Log out"
+                onClick={() => { logout(); navigate({ to: "/login" }); }}
+              >
+                <LogOut className="size-4" />
               </Button>
             </>
           )}
