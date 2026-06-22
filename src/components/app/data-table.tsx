@@ -69,10 +69,11 @@ export function DataTable<T extends { id: string }>({
       <div className="hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
+            <caption className="sr-only">Data table</caption>
             <thead>
               <tr className="border-b bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
                 {columns.map((c) => (
-                  <th key={c.key} className={`px-4 py-2.5 font-medium ${c.className ?? ""}`}>
+                  <th key={c.key} scope="col" className={`px-4 py-2.5 font-medium ${c.className ?? ""}`}>
                     {c.header}
                   </th>
                 ))}
@@ -87,7 +88,7 @@ export function DataTable<T extends { id: string }>({
                 </tr>
               ) : (
                 visible.map((row) => (
-                  <tr key={row.id} className="border-b transition-colors last:border-0 hover:bg-muted/40">
+                  <tr key={row.id} className="border-b transition-colors last:border-0 hover:bg-muted/40 focus-within:bg-muted/40">
                     {columns.map((c) => (
                       <td key={c.key} className={`px-4 py-2.5 align-middle ${c.className ?? ""}`}>
                         {c.cell(row)}
