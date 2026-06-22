@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppTokensRouteImport } from './routes/_app.tokens'
 import { Route as AppTimeTrackingRouteImport } from './routes/_app.time-tracking'
 import { Route as AppTimeHistoryRouteImport } from './routes/_app.time-history'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
@@ -27,6 +28,7 @@ import { Route as AppAdminUsersRouteImport } from './routes/_app.admin.users'
 import { Route as AppAdminUserSchedulesRouteImport } from './routes/_app.admin.user-schedules'
 import { Route as AppAdminUserAttendanceRouteImport } from './routes/_app.admin.user-attendance'
 import { Route as AppAdminScheduleApprovalsRouteImport } from './routes/_app.admin.schedule-approvals'
+import { Route as AppAdminEodReportsRouteImport } from './routes/_app.admin.eod-reports'
 import { Route as AppAdminChangeLogsRouteImport } from './routes/_app.admin.change-logs'
 import { Route as AppAdminAttendanceSummaryRouteImport } from './routes/_app.admin.attendance-summary'
 
@@ -43,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppTokensRoute = AppTokensRouteImport.update({
+  id: '/tokens',
+  path: '/tokens',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppTimeTrackingRoute = AppTimeTrackingRouteImport.update({
   id: '/time-tracking',
@@ -120,6 +127,11 @@ const AppAdminScheduleApprovalsRoute =
     path: '/schedule-approvals',
     getParentRoute: () => AppAdminRoute,
   } as any)
+const AppAdminEodReportsRoute = AppAdminEodReportsRouteImport.update({
+  id: '/eod-reports',
+  path: '/eod-reports',
+  getParentRoute: () => AppAdminRoute,
+} as any)
 const AppAdminChangeLogsRoute = AppAdminChangeLogsRouteImport.update({
   id: '/change-logs',
   path: '/change-logs',
@@ -145,8 +157,10 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/time-history': typeof AppTimeHistoryRoute
   '/time-tracking': typeof AppTimeTrackingRoute
+  '/tokens': typeof AppTokensRoute
   '/admin/attendance-summary': typeof AppAdminAttendanceSummaryRoute
   '/admin/change-logs': typeof AppAdminChangeLogsRoute
+  '/admin/eod-reports': typeof AppAdminEodReportsRoute
   '/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/admin/user-attendance': typeof AppAdminUserAttendanceRoute
   '/admin/user-schedules': typeof AppAdminUserSchedulesRoute
@@ -165,8 +179,10 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/time-history': typeof AppTimeHistoryRoute
   '/time-tracking': typeof AppTimeTrackingRoute
+  '/tokens': typeof AppTokensRoute
   '/admin/attendance-summary': typeof AppAdminAttendanceSummaryRoute
   '/admin/change-logs': typeof AppAdminChangeLogsRoute
+  '/admin/eod-reports': typeof AppAdminEodReportsRoute
   '/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/admin/user-attendance': typeof AppAdminUserAttendanceRoute
   '/admin/user-schedules': typeof AppAdminUserSchedulesRoute
@@ -188,8 +204,10 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/time-history': typeof AppTimeHistoryRoute
   '/_app/time-tracking': typeof AppTimeTrackingRoute
+  '/_app/tokens': typeof AppTokensRoute
   '/_app/admin/attendance-summary': typeof AppAdminAttendanceSummaryRoute
   '/_app/admin/change-logs': typeof AppAdminChangeLogsRoute
+  '/_app/admin/eod-reports': typeof AppAdminEodReportsRoute
   '/_app/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/_app/admin/user-attendance': typeof AppAdminUserAttendanceRoute
   '/_app/admin/user-schedules': typeof AppAdminUserSchedulesRoute
@@ -211,8 +229,10 @@ export interface FileRouteTypes {
     | '/settings'
     | '/time-history'
     | '/time-tracking'
+    | '/tokens'
     | '/admin/attendance-summary'
     | '/admin/change-logs'
+    | '/admin/eod-reports'
     | '/admin/schedule-approvals'
     | '/admin/user-attendance'
     | '/admin/user-schedules'
@@ -231,8 +251,10 @@ export interface FileRouteTypes {
     | '/settings'
     | '/time-history'
     | '/time-tracking'
+    | '/tokens'
     | '/admin/attendance-summary'
     | '/admin/change-logs'
+    | '/admin/eod-reports'
     | '/admin/schedule-approvals'
     | '/admin/user-attendance'
     | '/admin/user-schedules'
@@ -253,8 +275,10 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/time-history'
     | '/_app/time-tracking'
+    | '/_app/tokens'
     | '/_app/admin/attendance-summary'
     | '/_app/admin/change-logs'
+    | '/_app/admin/eod-reports'
     | '/_app/admin/schedule-approvals'
     | '/_app/admin/user-attendance'
     | '/_app/admin/user-schedules'
@@ -290,6 +314,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/tokens': {
+      id: '/_app/tokens'
+      path: '/tokens'
+      fullPath: '/tokens'
+      preLoaderRoute: typeof AppTokensRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/time-tracking': {
       id: '/_app/time-tracking'
@@ -396,6 +427,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminScheduleApprovalsRouteImport
       parentRoute: typeof AppAdminRoute
     }
+    '/_app/admin/eod-reports': {
+      id: '/_app/admin/eod-reports'
+      path: '/eod-reports'
+      fullPath: '/admin/eod-reports'
+      preLoaderRoute: typeof AppAdminEodReportsRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
     '/_app/admin/change-logs': {
       id: '/_app/admin/change-logs'
       path: '/change-logs'
@@ -416,6 +454,7 @@ declare module '@tanstack/react-router' {
 interface AppAdminRouteChildren {
   AppAdminAttendanceSummaryRoute: typeof AppAdminAttendanceSummaryRoute
   AppAdminChangeLogsRoute: typeof AppAdminChangeLogsRoute
+  AppAdminEodReportsRoute: typeof AppAdminEodReportsRoute
   AppAdminScheduleApprovalsRoute: typeof AppAdminScheduleApprovalsRoute
   AppAdminUserAttendanceRoute: typeof AppAdminUserAttendanceRoute
   AppAdminUserSchedulesRoute: typeof AppAdminUserSchedulesRoute
@@ -426,6 +465,7 @@ interface AppAdminRouteChildren {
 const AppAdminRouteChildren: AppAdminRouteChildren = {
   AppAdminAttendanceSummaryRoute: AppAdminAttendanceSummaryRoute,
   AppAdminChangeLogsRoute: AppAdminChangeLogsRoute,
+  AppAdminEodReportsRoute: AppAdminEodReportsRoute,
   AppAdminScheduleApprovalsRoute: AppAdminScheduleApprovalsRoute,
   AppAdminUserAttendanceRoute: AppAdminUserAttendanceRoute,
   AppAdminUserSchedulesRoute: AppAdminUserSchedulesRoute,
@@ -448,6 +488,7 @@ interface AppRouteChildren {
   AppSettingsRoute: typeof AppSettingsRoute
   AppTimeHistoryRoute: typeof AppTimeHistoryRoute
   AppTimeTrackingRoute: typeof AppTimeTrackingRoute
+  AppTokensRoute: typeof AppTokensRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -461,6 +502,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppSettingsRoute: AppSettingsRoute,
   AppTimeHistoryRoute: AppTimeHistoryRoute,
   AppTimeTrackingRoute: AppTimeTrackingRoute,
+  AppTokensRoute: AppTokensRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
