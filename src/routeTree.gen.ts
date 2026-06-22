@@ -25,6 +25,7 @@ import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppClientsRouteImport } from './routes/_app.clients'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as AppAdminIndexRouteImport } from './routes/_app.admin.index'
+import { Route as AppAdminUsersRouteImport } from './routes/_app.admin.users'
 import { Route as AppAdminUserSchedulesRouteImport } from './routes/_app.admin.user-schedules'
 import { Route as AppAdminUserAttendanceRouteImport } from './routes/_app.admin.user-attendance'
 import { Route as AppAdminScheduleApprovalsRouteImport } from './routes/_app.admin.schedule-approvals'
@@ -110,6 +111,11 @@ const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppAdminRoute,
 } as any)
+const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AppAdminRoute,
+} as any)
 const AppAdminUserSchedulesRoute = AppAdminUserSchedulesRouteImport.update({
   id: '/user-schedules',
   path: '/user-schedules',
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/admin/user-attendance': typeof AppAdminUserAttendanceRoute
   '/admin/user-schedules': typeof AppAdminUserSchedulesRoute
+  '/admin/users': typeof AppAdminUsersRoute
   '/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/admin/user-attendance': typeof AppAdminUserAttendanceRoute
   '/admin/user-schedules': typeof AppAdminUserSchedulesRoute
+  '/admin/users': typeof AppAdminUsersRoute
   '/admin': typeof AppAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/_app/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/_app/admin/user-attendance': typeof AppAdminUserAttendanceRoute
   '/_app/admin/user-schedules': typeof AppAdminUserSchedulesRoute
+  '/_app/admin/users': typeof AppAdminUsersRoute
   '/_app/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/admin/schedule-approvals'
     | '/admin/user-attendance'
     | '/admin/user-schedules'
+    | '/admin/users'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/admin/schedule-approvals'
     | '/admin/user-attendance'
     | '/admin/user-schedules'
+    | '/admin/users'
     | '/admin'
   id:
     | '__root__'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/_app/admin/schedule-approvals'
     | '/_app/admin/user-attendance'
     | '/_app/admin/user-schedules'
+    | '/_app/admin/users'
     | '/_app/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -394,6 +406,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminIndexRouteImport
       parentRoute: typeof AppAdminRoute
     }
+    '/_app/admin/users': {
+      id: '/_app/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AppAdminUsersRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
     '/_app/admin/user-schedules': {
       id: '/_app/admin/user-schedules'
       path: '/user-schedules'
@@ -438,6 +457,7 @@ interface AppAdminRouteChildren {
   AppAdminScheduleApprovalsRoute: typeof AppAdminScheduleApprovalsRoute
   AppAdminUserAttendanceRoute: typeof AppAdminUserAttendanceRoute
   AppAdminUserSchedulesRoute: typeof AppAdminUserSchedulesRoute
+  AppAdminUsersRoute: typeof AppAdminUsersRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
 }
 
@@ -447,6 +467,7 @@ const AppAdminRouteChildren: AppAdminRouteChildren = {
   AppAdminScheduleApprovalsRoute: AppAdminScheduleApprovalsRoute,
   AppAdminUserAttendanceRoute: AppAdminUserAttendanceRoute,
   AppAdminUserSchedulesRoute: AppAdminUserSchedulesRoute,
+  AppAdminUsersRoute: AppAdminUsersRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,
 }
 
