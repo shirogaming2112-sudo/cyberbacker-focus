@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppTimeTrackingRouteImport } from './routes/_app.time-tracking'
 import { Route as AppTimeHistoryRouteImport } from './routes/_app.time-history'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppSchedulesRouteImport } from './routes/_app.schedules'
 import { Route as AppScheduleRequestsRouteImport } from './routes/_app.schedule-requests'
 import { Route as AppPerformanceRouteImport } from './routes/_app.performance'
@@ -44,6 +45,11 @@ const AppTimeTrackingRoute = AppTimeTrackingRouteImport.update({
 const AppTimeHistoryRoute = AppTimeHistoryRouteImport.update({
   id: '/time-history',
   path: '/time-history',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSchedulesRoute = AppSchedulesRouteImport.update({
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/performance': typeof AppPerformanceRoute
   '/schedule-requests': typeof AppScheduleRequestsRoute
   '/schedules': typeof AppSchedulesRoute
+  '/settings': typeof AppSettingsRoute
   '/time-history': typeof AppTimeHistoryRoute
   '/time-tracking': typeof AppTimeTrackingRoute
 }
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/performance': typeof AppPerformanceRoute
   '/schedule-requests': typeof AppScheduleRequestsRoute
   '/schedules': typeof AppSchedulesRoute
+  '/settings': typeof AppSettingsRoute
   '/time-history': typeof AppTimeHistoryRoute
   '/time-tracking': typeof AppTimeTrackingRoute
 }
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/_app/performance': typeof AppPerformanceRoute
   '/_app/schedule-requests': typeof AppScheduleRequestsRoute
   '/_app/schedules': typeof AppSchedulesRoute
+  '/_app/settings': typeof AppSettingsRoute
   '/_app/time-history': typeof AppTimeHistoryRoute
   '/_app/time-tracking': typeof AppTimeTrackingRoute
 }
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/performance'
     | '/schedule-requests'
     | '/schedules'
+    | '/settings'
     | '/time-history'
     | '/time-tracking'
   fileRoutesByTo: FileRoutesByTo
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/performance'
     | '/schedule-requests'
     | '/schedules'
+    | '/settings'
     | '/time-history'
     | '/time-tracking'
   id:
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/_app/performance'
     | '/_app/schedule-requests'
     | '/_app/schedules'
+    | '/_app/settings'
     | '/_app/time-history'
     | '/_app/time-tracking'
   fileRoutesById: FileRoutesById
@@ -207,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/time-history'
       fullPath: '/time-history'
       preLoaderRoute: typeof AppTimeHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/schedules': {
@@ -269,6 +288,7 @@ interface AppRouteChildren {
   AppPerformanceRoute: typeof AppPerformanceRoute
   AppScheduleRequestsRoute: typeof AppScheduleRequestsRoute
   AppSchedulesRoute: typeof AppSchedulesRoute
+  AppSettingsRoute: typeof AppSettingsRoute
   AppTimeHistoryRoute: typeof AppTimeHistoryRoute
   AppTimeTrackingRoute: typeof AppTimeTrackingRoute
 }
@@ -281,6 +301,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPerformanceRoute: AppPerformanceRoute,
   AppScheduleRequestsRoute: AppScheduleRequestsRoute,
   AppSchedulesRoute: AppSchedulesRoute,
+  AppSettingsRoute: AppSettingsRoute,
   AppTimeHistoryRoute: AppTimeHistoryRoute,
   AppTimeTrackingRoute: AppTimeTrackingRoute,
 }
