@@ -1,22 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Info } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { PageHeader } from "@/components/app/page-header";
 import { StatusBadge, statusToTone } from "@/components/app/status-badge";
-import { clients, schedules } from "@/mock/data";
+import { clients } from "@/mock/data";
+import { useStore } from "@/lib/mock-store";
+import { ScheduleRequestModal } from "@/components/app/schedule-request-modal";
 
 export const Route = createFileRoute("/_app/schedules")({
   head: () => ({ meta: [{ title: "Schedules — Cyberbacker" }] }),
@@ -26,15 +18,17 @@ export const Route = createFileRoute("/_app/schedules")({
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
 function Schedules() {
+  const schedules = useStore((s) => s.schedules);
   const [open, setOpen] = useState(false);
+
   return (
     <div className="space-y-5">
       <PageHeader
         title="Schedules"
-        description="Manage your weekly schedules across clients."
+        description="View your weekly schedules. Edits are made through Schedule Requests."
         actions={
           <Button size="sm" onClick={() => setOpen(true)}>
-            <Plus className="size-4" />Request Schedule
+            <Plus className="size-4" aria-hidden /> Request a Change
           </Button>
         }
       />
@@ -107,78 +101,16 @@ function Schedules() {
         <TabsContent value="history" className="mt-4">
           <Card className="shadow-soft">
             <CardContent className="p-4 text-sm text-muted-foreground">
-              View past schedule revisions in <Link to="/schedule-requests" className="text-primary underline-offset-2 hover:underline">Schedule Requests</Link>.
+              View past schedule revisions in{" "}
+              <Link to="/schedule-requests" className="text-primary underline-offset-2 hover:underline">
+                Schedule Requests
+              </Link>.
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
 
-      <RequestScheduleDialog open={open} onOpenChange={setOpen} />
-    </div>
-  );
-}
-
-function RequestScheduleDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>Request Schedule Change</DialogTitle>
-          <DialogDescription>Define your weekly shift. Times entered in your local timezone are stored in MST.</DialogDescription>
-        </DialogHeader>
-
-        <div className="rounded-lg border bg-info/8 p-3 text-xs">
-          <div className="flex items-start gap-2">
-            <Info className="mt-0.5 size-4 shrink-0 text-info" />
-            <p>
-              Your first schedule is auto-activated. Subsequent requests are reviewed by your headbacker within 24 hours.
-              Times are saved in <strong>MST</strong>.
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <div>
-            <Label htmlFor="sname">Schedule Name</Label>
-            <Input id="sname" placeholder="e.g. Northwind Realty · Primary" className="mt-1.5" />
-          </div>
-          <div className="max-h-[40vh] space-y-2 overflow-y-auto pr-1">
-            {DAYS.map((day) => (
-              <div key={day} className="rounded-lg border p-3">
-                <p className="text-sm font-medium">{day}</p>
-                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  <FieldTime label="Clock In" />
-                  <FieldNum label="Lunch (min)" />
-                  <FieldNum label="Break (min)" />
-                  <FieldTime label="Clock Out" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={() => onOpenChange(false)}>Submit Request</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function FieldTime({ label }: { label: string }) {
-  return (
-    <div>
-      <Label className="text-xs">{label}</Label>
-      <Input type="time" className="mt-1 h-9" />
-    </div>
-  );
-}
-function FieldNum({ label }: { label: string }) {
-  return (
-    <div>
-      <Label className="text-xs">{label}</Label>
-      <Input type="number" min={0} className="mt-1 h-9" placeholder="0" />
+      <ScheduleRequestModal open={open} onOpenChange={setOpen} initial={null} />
     </div>
   );
 }
