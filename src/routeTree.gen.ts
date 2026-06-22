@@ -28,6 +28,7 @@ import { Route as AppAdminIndexRouteImport } from './routes/_app.admin.index'
 import { Route as AppAdminUserSchedulesRouteImport } from './routes/_app.admin.user-schedules'
 import { Route as AppAdminUserAttendanceRouteImport } from './routes/_app.admin.user-attendance'
 import { Route as AppAdminScheduleApprovalsRouteImport } from './routes/_app.admin.schedule-approvals'
+import { Route as AppAdminChangeLogsRouteImport } from './routes/_app.admin.change-logs'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -124,6 +125,11 @@ const AppAdminScheduleApprovalsRoute =
     path: '/schedule-approvals',
     getParentRoute: () => AppAdminRoute,
   } as any)
+const AppAdminChangeLogsRoute = AppAdminChangeLogsRouteImport.update({
+  id: '/change-logs',
+  path: '/change-logs',
+  getParentRoute: () => AppAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/time-history': typeof AppTimeHistoryRoute
   '/time-tracking': typeof AppTimeTrackingRoute
+  '/admin/change-logs': typeof AppAdminChangeLogsRoute
   '/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/admin/user-attendance': typeof AppAdminUserAttendanceRoute
   '/admin/user-schedules': typeof AppAdminUserSchedulesRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/time-history': typeof AppTimeHistoryRoute
   '/time-tracking': typeof AppTimeTrackingRoute
+  '/admin/change-logs': typeof AppAdminChangeLogsRoute
   '/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/admin/user-attendance': typeof AppAdminUserAttendanceRoute
   '/admin/user-schedules': typeof AppAdminUserSchedulesRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/time-history': typeof AppTimeHistoryRoute
   '/_app/time-tracking': typeof AppTimeTrackingRoute
+  '/_app/admin/change-logs': typeof AppAdminChangeLogsRoute
   '/_app/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/_app/admin/user-attendance': typeof AppAdminUserAttendanceRoute
   '/_app/admin/user-schedules': typeof AppAdminUserSchedulesRoute
@@ -203,6 +212,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/time-history'
     | '/time-tracking'
+    | '/admin/change-logs'
     | '/admin/schedule-approvals'
     | '/admin/user-attendance'
     | '/admin/user-schedules'
@@ -222,6 +232,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/time-history'
     | '/time-tracking'
+    | '/admin/change-logs'
     | '/admin/schedule-approvals'
     | '/admin/user-attendance'
     | '/admin/user-schedules'
@@ -243,6 +254,7 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/time-history'
     | '/_app/time-tracking'
+    | '/_app/admin/change-logs'
     | '/_app/admin/schedule-approvals'
     | '/_app/admin/user-attendance'
     | '/_app/admin/user-schedules'
@@ -390,10 +402,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminScheduleApprovalsRouteImport
       parentRoute: typeof AppAdminRoute
     }
+    '/_app/admin/change-logs': {
+      id: '/_app/admin/change-logs'
+      path: '/change-logs'
+      fullPath: '/admin/change-logs'
+      preLoaderRoute: typeof AppAdminChangeLogsRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
   }
 }
 
 interface AppAdminRouteChildren {
+  AppAdminChangeLogsRoute: typeof AppAdminChangeLogsRoute
   AppAdminScheduleApprovalsRoute: typeof AppAdminScheduleApprovalsRoute
   AppAdminUserAttendanceRoute: typeof AppAdminUserAttendanceRoute
   AppAdminUserSchedulesRoute: typeof AppAdminUserSchedulesRoute
@@ -401,6 +421,7 @@ interface AppAdminRouteChildren {
 }
 
 const AppAdminRouteChildren: AppAdminRouteChildren = {
+  AppAdminChangeLogsRoute: AppAdminChangeLogsRoute,
   AppAdminScheduleApprovalsRoute: AppAdminScheduleApprovalsRoute,
   AppAdminUserAttendanceRoute: AppAdminUserAttendanceRoute,
   AppAdminUserSchedulesRoute: AppAdminUserSchedulesRoute,
