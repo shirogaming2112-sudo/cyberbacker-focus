@@ -1,22 +1,17 @@
+# Cyberbacker Backend Spec (FastAPI + PostgreSQL)
 
-## Goal
-
-Produce a backend blueprint that mirrors the current mock-driven frontend: a FastAPI service with JWT auth, role-based access (`cyberbacker | hb | mb | software`), and a PostgreSQL schema covering users, clients, schedules, attendance, EOD reports, notifications, tokens/referrals, and audit logs.
-
-## Deliverable
-
-A single markdown doc at `docs/backend-spec.md` containing the sections below. No backend code is created; the frontend keeps using the mock store until wiring begins.
-
----
+Blueprint for a backend that mirrors the current mock-driven frontend. No code yet — this doc drives the follow-up implementation.
 
 ## 1. Stack & conventions
 
 - **FastAPI** + **SQLAlchemy 2.x** (async) + **Alembic** migrations + **Pydantic v2** schemas.
-- **Auth**: OAuth2 password flow → JWT access (15 min) + refresh (7 d). Google OAuth optional later.
-- **RBAC**: `require_role("hb","mb","software")` dependency; row-level checks in service layer.
-- **Pagination**: `?page=1&page_size=20`; responses wrap `{items, total, page, page_size}`.
-- **IDs**: UUID v4 primary keys. **Timestamps**: `created_at`, `updated_at` (UTC).
-- **Errors**: RFC7807 problem+json. **Filtering**: `?status=`, `?user_id=`, `?date_from=&date_to=`.
+- **Auth**: OAuth2 password flow → JWT access (15 min) + refresh (7 d). Google OAuth is phase 2.
+- **RBAC**: `require_role("hb","mb","software")` dependency + row-level checks in the service layer.
+- **Pagination**: `?page=1&page_size=20`, responses `{items, total, page, page_size}`.
+- **IDs**: UUID v4. **Timestamps**: `created_at`, `updated_at` in UTC.
+- **Errors**: RFC 7807 `application/problem+json`.
+- **Filtering**: `?status=`, `?user_id=`, `?date_from=&date_to=`.
+- **Roles**: `cyberbacker | hb | mb | software` (users can hold multiple).
 
 ---
 
@@ -35,11 +30,11 @@ users
   headbacker_id uuid null fk users(id)
   created_at, updated_at
 
-roles                       -- enum-like lookup
+roles                       -- lookup
   key text pk               -- 'cyberbacker'|'hb'|'mb'|'software'
   label text
 
-user_roles                  -- many-to-many (a user can be HB and Software, etc.)
+user_roles                  -- m2m (a user can be HB AND Software, etc.)
   user_id uuid fk users     pk part
   role_key text fk roles    pk part
 
@@ -88,7 +83,7 @@ schedule_approvals
   comment text
   decided_at timestamptz
 
-attendance_records
+attendance_records          -- aggregated per day
   id uuid pk
   user_id uuid fk users
   client_id uuid fk clients
@@ -103,7 +98,7 @@ attendance_records
   status text check (status in ('present','late','absent','leave','pending')) default 'pending'
   unique (user_id, date, client_id)
 
-attendance_events           -- raw clock in/out/break stream
+attendance_events           -- raw clock-in/out/break stream
   id uuid pk
   user_id uuid fk users
   client_id uuid fk clients
@@ -123,7 +118,7 @@ eod_reports
   reviewed_at timestamptz null
   created_at, updated_at
 
-eod_items                   -- highlights + blockers in one table
+eod_items                   -- highlights + blockers
   id uuid pk
   report_id uuid fk eod_reports on delete cascade
   kind text check (kind in ('highlight','blocker'))
@@ -161,7 +156,7 @@ notifications
   read_at timestamptz null
   created_at
 
-activity_log                  -- feed for dashboard
+activity_log                  -- dashboard feed
   id uuid pk
   user_id uuid fk users
   kind text
@@ -179,39 +174,48 @@ change_logs                   -- audit
   updated_at timestamptz
 ```
 
-Indexes: `attendance_records(user_id,date)`, `eod_reports(user_id,date)`, `schedules(user_id,status)`, `notifications(user_id,read_at)`, `referrals(token_id,created_at)`.
+Recommended indexes:
+- `attendance_records(user_id, date)`
+- `eod_reports(user_id, date)`, `eod_reports(status)`
+- `schedules(user_id, status)`
+- `notifications(user_id, read_at)`
+- `referrals(token_id, created_at)`
+- `change_logs(entity_type, entity_id)`
 
 ---
 
 ## 3. FastAPI endpoints
 
 ### Auth (`/auth`)
-- `POST /auth/login` — email+password → tokens
-- `POST /auth/refresh`
-- `POST /auth/logout`
-- `POST /auth/google` — OAuth callback (phase 2)
-- `GET  /auth/me` — current user + roles + permissions
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/auth/login` | email+password → `{access, refresh}` |
+| POST | `/auth/refresh` | rotate access token |
+| POST | `/auth/logout` | revoke refresh |
+| POST | `/auth/google` | OAuth callback (phase 2) |
+| GET  | `/auth/me` | current user + roles + resolved permissions |
 
 ### Users (`/users`) — admin gated
-- `GET    /users` — list, filter by role/status/headbacker, search
-- `POST   /users` — create (software)
+- `GET    /users` — list, filter by `role`, `status`, `headbacker_id`, `q` search
+- `POST   /users` — software only
 - `GET    /users/{id}`
-- `PATCH  /users/{id}` — edit name/title/status/headbacker (hb/mb/software)
-- `DELETE /users/{id}` — software
+- `PATCH  /users/{id}` — name/title/status/headbacker (hb/mb/software)
+- `DELETE /users/{id}` — software only
 - `POST   /users/{id}/impersonate` — software → short-lived token
 - `POST   /users/{id}/reset-password` — software
-- `PATCH  /users/{id}/headbacker` — assign headbacker
-- `GET    /users/headbackers` — list HB-role users (picker source)
+- `PATCH  /users/{id}/headbacker` `{headbacker_id}`
+- `GET    /users/headbackers` — HB-role users, used by the picker dialog
 
-### Clients (`/clients`) — admin gated (kept even though UI tab removed)
-- `GET/POST/PATCH/DELETE /clients`, `/clients/{id}`
-- `POST /clients/{id}/assign` `{user_id}` · `DELETE /clients/{id}/assign/{user_id}`
+### Clients (`/clients`) — admin gated
+- `GET/POST /clients`, `GET/PATCH/DELETE /clients/{id}`
+- `POST /clients/{id}/assign` `{user_id}`
+- `DELETE /clients/{id}/assign/{user_id}`
 
 ### Schedules (`/schedules`)
 - `GET  /schedules?user_id=&status=` — self by default; admin sees all
 - `GET  /schedules/{id}`
-- `POST /schedules` — create pending request (any role for self)
-- `PATCH /schedules/{id}` — request edit → creates new pending, sets `superseded_by` on approval
+- `POST /schedules` — create pending request
+- `PATCH /schedules/{id}` — edit → creates new pending, sets `superseded_by` on approval
 - `POST /schedules/{id}/approve` — hb/mb/software
 - `POST /schedules/{id}/reject`  — hb/mb/software `{comment}`
 - `GET  /schedule-approvals?status=pending` — admin queue
@@ -220,38 +224,41 @@ Indexes: `attendance_records(user_id,date)`, `eod_reports(user_id,date)`, `sched
 - `POST /attendance/clock-in` `{client_id}`
 - `POST /attendance/clock-out`
 - `POST /attendance/break/start` · `POST /attendance/break/end`
-- `GET  /attendance/today` — current session
+- `GET  /attendance/today` — current live session
 - `GET  /attendance/history?user_id=&date_from=&date_to=`
-- `GET  /attendance/summary?range=&user_id=&client_id=` — mb/software only (aggregates)
+- `GET  /attendance/summary?range=&user_id=&client_id=` — mb/software only
 - `PATCH /attendance/{id}` — manual correction (hb/mb/software)
 
 ### EOD Reports (`/eod`)
 - `GET  /eod?user_id=&client_id=&status=&date_from=&date_to=`
-- `POST /eod` — create (self) with highlights[]/blockers[]/attachments
+- `POST /eod` — create (self) with `highlights[]`, `blockers[]`, attachments
 - `GET  /eod/{id}`
 - `PATCH /eod/{id}` — author edit while `submitted`
-- `POST /eod/{id}/approve` `{comment?}` — hb/mb/software → status `reviewed`
-- `POST /eod/{id}/disapprove` `{comment?}` — status `flagged`
+- `POST /eod/{id}/approve` `{comment?}` → status `reviewed`
+- `POST /eod/{id}/disapprove` `{comment?}` → status `flagged`
 - `POST /eod/{id}/attachments` — multipart upload
 
 ### Tokens & referrals (`/tokens`)
 - `GET    /tokens` — current user's tokens
-- `POST   /tokens` `{name}` — slugified; returns apply URL
+- `POST   /tokens` `{name}` — slugified; returns apply URL `https://apply.cyberbackercareers.com/?ref={slug}`
 - `DELETE /tokens/{id}`
-- `GET    /tokens/{id}/referrals` — proxied/cached from GHL, `{items,total,stages_count}`
+- `GET    /tokens/{id}/referrals` — proxied/cached from GHL, `{items, total, stages_count}`
 - `POST   /webhooks/ghl/referrals` — GHL → upsert `referrals` (HMAC verify)
 
 ### Notifications (`/notifications`)
-- `GET   /notifications?unread=true`
-- `POST  /notifications/{id}/read` · `POST /notifications/read-all`
-- `GET   /notifications/stream` — SSE (phase 2)
+- `GET  /notifications?unread=true`
+- `POST /notifications/{id}/read`
+- `POST /notifications/read-all`
+- `GET  /notifications/stream` — SSE (phase 2)
 
 ### Activity & audit
 - `GET /activity?user_id=&limit=` — dashboard feed
 - `GET /change-logs?entity_type=&entity_id=` — admin
 
 ### Profile & settings
-- `GET/PATCH /me/profile` · `POST /me/password` · `GET/PATCH /me/settings`
+- `GET/PATCH /me/profile`
+- `POST /me/password`
+- `GET/PATCH /me/settings`
 
 ### Meta
 - `GET /health` · `GET /roles` · `GET /permissions`
@@ -261,20 +268,20 @@ Indexes: `attendance_records(user_id,date)`, `eod_reports(user_id,date)`, `sched
 ## 4. Permission matrix (server-enforced)
 
 | Endpoint group | CB | HB | MB | SW |
-|---|---|---|---|---|
+|---|:-:|:-:|:-:|:-:|
 | Own schedules / attendance / EOD | ✓ | ✓ | ✓ | ✓ |
 | Tokens (own) | ✓ | ✓ | ✓ | ✓ |
-| Users list/edit | — | ✓ | ✓ | ✓ |
+| Users list / edit | — | ✓ | ✓ | ✓ |
 | Users impersonate / reset password | — | — | — | ✓ |
-| EOD approve/disapprove | — | ✓ | ✓ | ✓ |
-| Schedule approve/reject | — | ✓ | ✓ | ✓ |
+| EOD approve / disapprove | — | ✓ | ✓ | ✓ |
+| Schedule approve / reject | — | ✓ | ✓ | ✓ |
 | Attendance summary | — | — | ✓ | ✓ |
 | Change logs | — | ✓ | ✓ | ✓ |
 
 ---
 
-## 5. Out of scope for this doc
+## 5. Out of scope
 
-- Actual FastAPI code, migrations, Docker/deploy config.
+- Actual FastAPI project code, migrations, Docker/deploy config.
 - Frontend swap from mock store to real API (separate task).
 - GHL contract details beyond a webhook + polling stub.
