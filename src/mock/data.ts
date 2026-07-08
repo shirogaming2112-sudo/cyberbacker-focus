@@ -165,7 +165,7 @@ export const changeLogs: ChangeLog[] = Array.from({ length: 6 }, (_, i) => ({
 }));
 
 export const attendanceSummary: AttendanceSummary[] = [
-  { id: "as_1", range: "Apr 01 – Apr 15, 2026", userName: "Nemrod Baquiran", client: "Northwind Realty", totalHours: 78.5, totalOvertime: 3.5, totalAbsences: 0, unpaidLeave: 0, paidLeave: 0, checked: true },
-  { id: "as_2", range: "Apr 01 – Apr 15, 2026", userName: "Justine Robles", client: "Bluepeak Health", totalHours: 74, totalOvertime: 0, totalAbsences: 1, unpaidLeave: 1, paidLeave: 0, checked: true },
-  { id: "as_3", range: "Apr 01 – Apr 15, 2026", userName: "Lea Luisa Santiago", client: "Moneybacker", totalHours: 80, totalOvertime: 4, totalAbsences: 0, unpaidLeave: 0, paidLeave: 0, checked: false },
+  { id: "as_1", range: "Apr 01 – Apr 15, 2026", startDate: "2026-04-01", endDate: "2026-04-15", userName: "Nemrod Baquiran", client: "Northwind Realty", totalHours: 78.5, totalOvertime: 3.5, totalAbsences: 0, unpaidLeave: 0, paidLeave: 0, checked: true },
+  { id: "as_2", range: "Apr 01 – Apr 15, 2026", startDate: "2026-04-01", endDate: "2026-04-15", userName: "Justine Robles", client: "Bluepeak Health", totalHours: 74, totalOvertime: 0, totalAbsences: 1, unpaidLeave: 1, paidLeave: 0, checked: true },
+  { id: "as_3", range: "Apr 01 – Apr 15, 2026", startDate: "2026-04-01", endDate: "2026-04-15", userName: "Lea Luisa Santiago", client: "Moneybacker", totalHours: 80, totalOvertime: 4, totalAbsences: 0, unpaidLeave: 0, paidLeave: 0, checked: false },
 ];
