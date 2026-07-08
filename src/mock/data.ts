@@ -16,6 +16,7 @@ export const currentUser: User = {
   name: "Nemrod Baquiran",
   email: "nemrod.baquiran@cyberbacker.com",
   role: "admin",
+  appRole: "software",
   title: "Senior Cyberbacker",
   timezone: "America/Denver",
   status: "Active",
@@ -23,10 +24,10 @@ export const currentUser: User = {
 
 export const users: User[] = [
   currentUser,
-  { id: "u_2", name: "Justine Robles", email: "justine.robles@cyberbacker.com", role: "employee", title: "Cyberbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
-  { id: "u_3", name: "Jojo Constantino", email: "jojo.constantino@cyberbacker.com", role: "employee", title: "Cyberbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
-  { id: "u_4", name: "Lea Luisa Santiago", email: "lea.santiago@cyberbacker.com", role: "employee", title: "Lead Cyberbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
-  { id: "u_5", name: "Leandre John Sabado", email: "leandre.sabado@cyberbacker.com", role: "employee", title: "Cyberbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
+  { id: "u_2", name: "Justine Robles", email: "justine.robles@cyberbacker.com", role: "employee", appRole: "cyberbacker", title: "Cyberbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
+  { id: "u_3", name: "Jojo Constantino", email: "jojo.constantino@cyberbacker.com", role: "employee", appRole: "cyberbacker", title: "Cyberbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
+  { id: "u_4", name: "Lea Luisa Santiago", email: "lea.santiago@cyberbacker.com", role: "admin", appRole: "hb", title: "Headbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
+  { id: "u_5", name: "Leandre John Sabado", email: "leandre.sabado@cyberbacker.com", role: "admin", appRole: "mb", title: "Moneybacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
 ];
 
 export const clients: Client[] = [
