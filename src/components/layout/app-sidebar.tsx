@@ -123,6 +123,7 @@ export function AppSidebar() {
               <SidebarMenu>
                 {adminNav
                   .filter((item) => !item.requireSummary || can.viewAttendanceSummary(role!))
+                  .filter((item) => !item.requireChangeLogs || can.viewChangeLogs(role!))
                   .map((item) => (
                     <SidebarMenuItem key={item.to}>
                       <SidebarMenuButton asChild isActive={isActive(item.to)} tooltip={item.label}>
