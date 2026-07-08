@@ -93,7 +93,7 @@ function UsersPage() {
         description="Manage roles, status, and assignments across your team."
         actions={role && can.editUser(role) ? <Button>Invite User</Button> : undefined}
       />
-      <DataTable rows={users} columns={cols} searchKeys={["name", "email", "role"]} searchPlaceholder="Search name, email, role…" />
+      <DataTable rows={visibleUsers} columns={cols} searchKeys={["name", "email", "role"]} searchPlaceholder="Search name, email, role…" />
       <HeadbackerPickerDialog
         open={!!pickerFor}
         onOpenChange={(v) => !v && setPickerFor(null)}
