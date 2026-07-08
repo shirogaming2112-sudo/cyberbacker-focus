@@ -126,6 +126,24 @@ function EodPage() {
                   </section>
                 </div>
 
+                {current.files && current.files.length > 0 && (
+                  <section className="mt-4">
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Attachments</h3>
+                    <ul className="mt-1 space-y-1.5">
+                      {current.files.map((f, i) => (
+                        <li key={i} className="flex items-center gap-2 rounded-md border bg-card px-2.5 py-1.5 text-sm">
+                          <FileText className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                          <span className="min-w-0 flex-1 truncate">{f.name}</span>
+                          <span className="text-xs text-muted-foreground tabular-nums">{(f.size / 1024).toFixed(0)} KB</span>
+                          <a href={f.dataUrl} download={f.name} aria-label={`Download ${f.name}`} className="rounded p-1 hover:bg-muted">
+                            <Download className="size-4" />
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+
                 {"reviewComment" in current && current.reviewComment && (
                   <section className="mt-4 rounded-md border bg-info/8 p-3">
                     <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Reviewer comment</h3>
