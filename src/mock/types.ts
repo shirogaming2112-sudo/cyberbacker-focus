@@ -115,6 +115,7 @@ export interface ScheduleApproval {
   status: "pending" | "approved" | "rejected";
   createdAt: string;
   updatedAt: string;
+  notes?: string;
 }
 
 export interface AttendanceSummary {
@@ -128,4 +129,7 @@ export interface AttendanceSummary {
   unpaidLeave: number;
   paidLeave: number;
   checked: boolean;
+  notes?: string;
+  startDate?: string;
+  endDate?: string;
 }
