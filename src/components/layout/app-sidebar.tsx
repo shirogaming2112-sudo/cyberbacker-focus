@@ -54,14 +54,14 @@ const mainNav = [
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
-type AdminItem = { to: string; label: string; icon: typeof ShieldCheck; requireSummary?: boolean };
+type AdminItem = { to: string; label: string; icon: typeof ShieldCheck; requireSummary?: boolean; requireChangeLogs?: boolean };
 const adminNav: AdminItem[] = [
   { to: "/admin", label: "Admin Overview", icon: ShieldCheck },
   { to: "/admin/schedule-approvals", label: "Schedule Approvals", icon: CalendarCheck },
   { to: "/admin/eod-reports", label: "EOD Reviews", icon: FileText },
   { to: "/admin/user-attendance", label: "User Attendance", icon: ClipboardList },
   { to: "/admin/user-schedules", label: "User Schedules", icon: CalendarDays },
-  { to: "/admin/change-logs", label: "Change Logs", icon: FileClock },
+  { to: "/admin/change-logs", label: "Change Logs", icon: FileClock, requireChangeLogs: true },
   { to: "/admin/attendance-summary", label: "Attendance Summary", icon: BarChart3, requireSummary: true },
   { to: "/admin/users", label: "Users Management", icon: UsersIcon },
 ];
@@ -123,6 +123,7 @@ export function AppSidebar() {
               <SidebarMenu>
                 {adminNav
                   .filter((item) => !item.requireSummary || can.viewAttendanceSummary(role!))
+                  .filter((item) => !item.requireChangeLogs || can.viewChangeLogs(role!))
                   .map((item) => (
                     <SidebarMenuItem key={item.to}>
                       <SidebarMenuButton asChild isActive={isActive(item.to)} tooltip={item.label}>

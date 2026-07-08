@@ -16,6 +16,7 @@ export const currentUser: User = {
   name: "Nemrod Baquiran",
   email: "nemrod.baquiran@cyberbacker.com",
   role: "admin",
+  appRole: "software",
   title: "Senior Cyberbacker",
   timezone: "America/Denver",
   status: "Active",
@@ -23,10 +24,10 @@ export const currentUser: User = {
 
 export const users: User[] = [
   currentUser,
-  { id: "u_2", name: "Justine Robles", email: "justine.robles@cyberbacker.com", role: "employee", title: "Cyberbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
-  { id: "u_3", name: "Jojo Constantino", email: "jojo.constantino@cyberbacker.com", role: "employee", title: "Cyberbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
-  { id: "u_4", name: "Lea Luisa Santiago", email: "lea.santiago@cyberbacker.com", role: "employee", title: "Lead Cyberbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
-  { id: "u_5", name: "Leandre John Sabado", email: "leandre.sabado@cyberbacker.com", role: "employee", title: "Cyberbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
+  { id: "u_2", name: "Justine Robles", email: "justine.robles@cyberbacker.com", role: "employee", appRole: "cyberbacker", title: "Cyberbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
+  { id: "u_3", name: "Jojo Constantino", email: "jojo.constantino@cyberbacker.com", role: "employee", appRole: "cyberbacker", title: "Cyberbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
+  { id: "u_4", name: "Lea Luisa Santiago", email: "lea.santiago@cyberbacker.com", role: "admin", appRole: "hb", title: "Headbacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
+  { id: "u_5", name: "Leandre John Sabado", email: "leandre.sabado@cyberbacker.com", role: "admin", appRole: "mb", title: "Moneybacker", timezone: "Asia/Manila", headbacker: "Nemrod Baquiran", status: "Active" },
 ];
 
 export const clients: Client[] = [
@@ -164,7 +165,7 @@ export const changeLogs: ChangeLog[] = Array.from({ length: 6 }, (_, i) => ({
 }));
 
 export const attendanceSummary: AttendanceSummary[] = [
-  { id: "as_1", range: "Apr 01 – Apr 15, 2026", userName: "Nemrod Baquiran", client: "Northwind Realty", totalHours: 78.5, totalOvertime: 3.5, totalAbsences: 0, unpaidLeave: 0, paidLeave: 0, checked: true },
-  { id: "as_2", range: "Apr 01 – Apr 15, 2026", userName: "Justine Robles", client: "Bluepeak Health", totalHours: 74, totalOvertime: 0, totalAbsences: 1, unpaidLeave: 1, paidLeave: 0, checked: true },
-  { id: "as_3", range: "Apr 01 – Apr 15, 2026", userName: "Lea Luisa Santiago", client: "Moneybacker", totalHours: 80, totalOvertime: 4, totalAbsences: 0, unpaidLeave: 0, paidLeave: 0, checked: false },
+  { id: "as_1", range: "Apr 01 – Apr 15, 2026", startDate: "2026-04-01", endDate: "2026-04-15", userName: "Nemrod Baquiran", client: "Northwind Realty", totalHours: 78.5, totalOvertime: 3.5, totalAbsences: 0, unpaidLeave: 0, paidLeave: 0, checked: true },
+  { id: "as_2", range: "Apr 01 – Apr 15, 2026", startDate: "2026-04-01", endDate: "2026-04-15", userName: "Justine Robles", client: "Bluepeak Health", totalHours: 74, totalOvertime: 0, totalAbsences: 1, unpaidLeave: 1, paidLeave: 0, checked: true },
+  { id: "as_3", range: "Apr 01 – Apr 15, 2026", startDate: "2026-04-01", endDate: "2026-04-15", userName: "Lea Luisa Santiago", client: "Moneybacker", totalHours: 80, totalOvertime: 4, totalAbsences: 0, unpaidLeave: 0, paidLeave: 0, checked: false },
 ];

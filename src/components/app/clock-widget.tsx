@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { Play, Square, Coffee, FileUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { useStore } from "@/lib/mock-store";
+import { clients } from "@/mock/data";
+import { toast } from "sonner";
 
 type Mode = "idle" | "working" | "break";
 
@@ -22,9 +27,11 @@ export function ClockWidget({
   className?: string;
   compact?: boolean;
 }) {
+  const schedules = useStore((s) => s.schedules.filter((x) => x.userId === "u_1" && x.status === "active"));
   const [mode, setMode] = useState<Mode>("idle");
   const [worked, setWorked] = useState(0);
   const [breakSec, setBreakSec] = useState(0);
+  const [scheduleId, setScheduleId] = useState<string>(schedules[0]?.id ?? "");
 
   useEffect(() => {
     if (mode === "idle") return;
@@ -34,6 +41,15 @@ export function ClockWidget({
     }, 1000);
     return () => clearInterval(id);
   }, [mode]);
+
+  const startClock = () => {
+    if (!scheduleId) { toast.error("Select a schedule to clock in with"); return; }
+    const sched = schedules.find((s) => s.id === scheduleId);
+    const client = clients.find((c) => c.id === sched?.clientId);
+    setMode("working");
+    toast.success(`Clocked in · ${client?.name ?? sched?.name ?? "Schedule"}`);
+  };
+
 
   const total = shiftHours * 3600;
   const pct = Math.min(100, (worked / total) * 100);
@@ -103,14 +119,34 @@ export function ClockWidget({
             </div>
           </div>
 
+          {mode === "idle" && (
+            <div>
+              <Label htmlFor="clock-schedule" className="text-xs">Schedule</Label>
+              <Select value={scheduleId} onValueChange={setScheduleId}>
+                <SelectTrigger id="clock-schedule" className="mt-1 h-9">
+                  <SelectValue placeholder={schedules.length ? "Choose a schedule" : "No active schedules"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {schedules.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2">
             {mode === "working" ? (
               <Button variant="destructive" onClick={() => setMode("idle")}>
                 <Square className="size-4" /> Clock Out
               </Button>
-            ) : (
+            ) : mode === "break" ? (
               <Button onClick={() => setMode("working")}>
-                <Play className="size-4" /> {mode === "break" ? "Resume" : "Clock In"}
+                <Play className="size-4" /> Resume
+              </Button>
+            ) : (
+              <Button onClick={startClock} disabled={!scheduleId}>
+                <Play className="size-4" /> Clock In
               </Button>
             )}
             <Button
@@ -124,6 +160,7 @@ export function ClockWidget({
               <FileUp className="size-4" /> Upload EOD
             </Button>
           </div>
+
         </div>
       </div>
     </Card>

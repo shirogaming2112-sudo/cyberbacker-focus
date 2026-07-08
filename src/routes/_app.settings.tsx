@@ -24,7 +24,6 @@ function Settings() {
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="prefs">Preferences</TabsTrigger>
           <TabsTrigger value="notif">Notifications</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-4">
@@ -69,15 +68,6 @@ function Settings() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="security" className="mt-4">
-          <Card className="shadow-soft">
-            <CardContent className="space-y-4 p-5">
-              <Row label="Two-factor authentication" desc="Require a code in addition to your password"><Switch defaultChecked /></Row>
-              <Row label="Session timeout" desc="Sign out after 30 minutes of inactivity"><Switch /></Row>
-              <div className="flex justify-end"><Button variant="outline">Sign out all sessions</Button></div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );

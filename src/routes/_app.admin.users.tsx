@@ -9,7 +9,7 @@ import { users as seedUsers } from "@/mock/data";
 import type { User } from "@/mock/types";
 import { KeyRound, UserCog, UserSquare2, Pencil } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { can } from "@/lib/permissions";
+import { can, visibleUserRoles, ROLE_LABEL } from "@/lib/permissions";
 import { HeadbackerPickerDialog } from "@/components/app/headbacker-picker-dialog";
 
 export const Route = createFileRoute("/_app/admin/users")({
@@ -21,6 +21,9 @@ function UsersPage() {
   const { role } = useAuth();
   const [users, setUsers] = useState<User[]>(seedUsers);
   const [pickerFor, setPickerFor] = useState<User | null>(null);
+
+  const allowed = role ? visibleUserRoles(role) : [];
+  const visibleUsers = users.filter((u) => u.appRole && allowed.includes(u.appRole));
 
   const updateHeadbacker = (userId: string, name: string) => {
     setUsers((arr) => arr.map((u) => u.id === userId ? { ...u, headbacker: name } : u));
@@ -45,7 +48,7 @@ function UsersPage() {
       ),
     },
     { key: "email", header: "Email", cell: (r) => r.email },
-    { key: "role", header: "Role", cell: (r) => <StatusBadge tone={r.role === "admin" ? "primary" : "muted"}>{r.role}</StatusBadge> },
+    { key: "role", header: "Role", cell: (r) => <StatusBadge tone={r.appRole === "software" ? "primary" : "muted"}>{r.appRole ? ROLE_LABEL[r.appRole] : r.role}</StatusBadge> },
     { key: "status", header: "Status", cell: (r) => <StatusBadge tone={r.status === "Active" ? "success" : "muted"}>{r.status}</StatusBadge> },
     {
       key: "hb",
@@ -90,7 +93,7 @@ function UsersPage() {
         description="Manage roles, status, and assignments across your team."
         actions={role && can.editUser(role) ? <Button>Invite User</Button> : undefined}
       />
-      <DataTable rows={users} columns={cols} searchKeys={["name", "email", "role"]} searchPlaceholder="Search name, email, role…" />
+      <DataTable rows={visibleUsers} columns={cols} searchKeys={["name", "email", "role"]} searchPlaceholder="Search name, email, role…" />
       <HeadbackerPickerDialog
         open={!!pickerFor}
         onOpenChange={(v) => !v && setPickerFor(null)}

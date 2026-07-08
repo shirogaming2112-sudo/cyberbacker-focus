@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/app/page-header";
 import { DataTable, type Column } from "@/components/app/data-table";
 import { StatusBadge, statusToTone } from "@/components/app/status-badge";
@@ -23,10 +26,26 @@ const cols: Column<AttendanceRecord & { clientName: string }>[] = [
 ];
 
 function TimeHistory() {
-  const rows = attendance.map((a) => ({
-    ...a,
-    clientName: clients.find((c) => c.id === a.clientId)?.name ?? "—",
-  }));
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [time, setTime] = useState("");
+
+  const rows = useMemo(() => {
+    return attendance
+      .map((a) => ({ ...a, clientName: clients.find((c) => c.id === a.clientId)?.name ?? "—" }))
+      .filter((r) => {
+        if (from && r.date < from) return false;
+        if (to && r.date > to) return false;
+        if (time) {
+          const needle = time.toLowerCase();
+          const inMatch = (r.clockIn ?? "").toLowerCase().includes(needle);
+          const outMatch = (r.clockOut ?? "").toLowerCase().includes(needle);
+          if (!inMatch && !outMatch) return false;
+        }
+        return true;
+      });
+  }, [from, to, time]);
+
   return (
     <div className="space-y-5">
       <PageHeader
@@ -34,6 +53,23 @@ function TimeHistory() {
         description="Search, filter, and export your full attendance log."
         actions={<Button variant="outline" size="sm"><Download className="size-4" />Export CSV</Button>}
       />
+      <div className="flex flex-wrap items-end gap-3 rounded-md border bg-card p-3">
+        <div>
+          <Label htmlFor="ah-from" className="text-xs">From</Label>
+          <Input id="ah-from" type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="mt-1 h-9 w-[160px]" />
+        </div>
+        <div>
+          <Label htmlFor="ah-to" className="text-xs">To</Label>
+          <Input id="ah-to" type="date" value={to} onChange={(e) => setTo(e.target.value)} className="mt-1 h-9 w-[160px]" />
+        </div>
+        <div>
+          <Label htmlFor="ah-time" className="text-xs">Time</Label>
+          <Input id="ah-time" value={time} onChange={(e) => setTime(e.target.value)} placeholder="e.g. 09:00 AM" className="mt-1 h-9 w-[160px]" />
+        </div>
+        {(from || to || time) && (
+          <Button variant="ghost" size="sm" onClick={() => { setFrom(""); setTo(""); setTime(""); }}>Clear</Button>
+        )}
+      </div>
       <DataTable
         rows={rows}
         columns={cols}

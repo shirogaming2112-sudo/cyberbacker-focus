@@ -7,6 +7,7 @@ export interface User {
   name: string;
   email: string;
   role: Role;
+  appRole?: "cyberbacker" | "hb" | "mb" | "software";
   avatarUrl?: string;
   title: string;
   timezone: string;
@@ -59,15 +60,24 @@ export interface AttendanceRecord {
   status: AttendanceStatus;
 }
 
+export interface EodFile {
+  name: string;
+  size: number;
+  type: string;
+  dataUrl: string;
+}
+
 export interface EodReport {
   id: string;
   userId: string;
   clientId: string;
+  scheduleId?: string;
   date: string;
   summary: string;
   highlights: string[];
   blockers: string[];
   attachments: number;
+  files?: EodFile[];
   status: "submitted" | "reviewed" | "flagged";
 }
 
@@ -106,6 +116,7 @@ export interface ScheduleApproval {
   status: "pending" | "approved" | "rejected";
   createdAt: string;
   updatedAt: string;
+  notes?: string;
 }
 
 export interface AttendanceSummary {
@@ -119,4 +130,7 @@ export interface AttendanceSummary {
   unpaidLeave: number;
   paidLeave: number;
   checked: boolean;
+  notes?: string;
+  startDate?: string;
+  endDate?: string;
 }
