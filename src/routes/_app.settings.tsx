@@ -24,7 +24,6 @@ function Settings() {
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="prefs">Preferences</TabsTrigger>
           <TabsTrigger value="notif">Notifications</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-4">
