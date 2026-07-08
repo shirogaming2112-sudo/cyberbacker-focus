@@ -48,7 +48,7 @@ function UsersPage() {
       ),
     },
     { key: "email", header: "Email", cell: (r) => r.email },
-    { key: "role", header: "Role", cell: (r) => <StatusBadge tone={r.role === "admin" ? "primary" : "muted"}>{r.role}</StatusBadge> },
+    { key: "role", header: "Role", cell: (r) => <StatusBadge tone={r.appRole === "software" ? "primary" : "muted"}>{r.appRole ? ROLE_LABEL[r.appRole] : r.role}</StatusBadge> },
     { key: "status", header: "Status", cell: (r) => <StatusBadge tone={r.status === "Active" ? "success" : "muted"}>{r.status}</StatusBadge> },
     {
       key: "hb",
