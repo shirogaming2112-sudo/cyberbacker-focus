@@ -76,10 +76,17 @@ function EodPage() {
                     <h2 className="font-display text-lg font-semibold">
                       {clients.find((c) => c.id === current.clientId)?.name ?? "—"}
                     </h2>
+                    {current.scheduleId && (
+                      <p className="text-xs text-muted-foreground">
+                        {allSchedules.find((s) => s.id === current.scheduleId)?.name}
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <StatusBadge tone={statusToTone(current.status)}>{current.status}</StatusBadge>
-                    {current.attachments > 0 && <Badge variant="secondary">{current.attachments} file</Badge>}
+                    {(current.files?.length ?? current.attachments) > 0 && (
+                      <Badge variant="secondary">{current.files?.length ?? current.attachments} file{(current.files?.length ?? current.attachments) === 1 ? "" : "s"}</Badge>
+                    )}
                   </div>
                 </div>
 
