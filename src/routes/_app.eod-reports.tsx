@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Download, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/app/page-header";
 import { StatusBadge, statusToTone } from "@/components/app/status-badge";
-import { clients } from "@/mock/data";
+import { clients, schedules as allSchedules } from "@/mock/data";
 import { useStore } from "@/lib/mock-store";
 import { EodReportModal } from "@/components/app/eod-report-modal";
 
