@@ -7,6 +7,7 @@ export interface User {
   name: string;
   email: string;
   role: Role;
+  appRole?: "cyberbacker" | "hb" | "mb" | "software";
   avatarUrl?: string;
   title: string;
   timezone: string;
