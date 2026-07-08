@@ -119,14 +119,34 @@ export function ClockWidget({
             </div>
           </div>
 
+          {mode === "idle" && (
+            <div>
+              <Label htmlFor="clock-schedule" className="text-xs">Schedule</Label>
+              <Select value={scheduleId} onValueChange={setScheduleId}>
+                <SelectTrigger id="clock-schedule" className="mt-1 h-9">
+                  <SelectValue placeholder={schedules.length ? "Choose a schedule" : "No active schedules"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {schedules.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2">
             {mode === "working" ? (
               <Button variant="destructive" onClick={() => setMode("idle")}>
                 <Square className="size-4" /> Clock Out
               </Button>
-            ) : (
+            ) : mode === "break" ? (
               <Button onClick={() => setMode("working")}>
-                <Play className="size-4" /> {mode === "break" ? "Resume" : "Clock In"}
+                <Play className="size-4" /> Resume
+              </Button>
+            ) : (
+              <Button onClick={startClock} disabled={!scheduleId}>
+                <Play className="size-4" /> Clock In
               </Button>
             )}
             <Button
@@ -140,6 +160,7 @@ export function ClockWidget({
               <FileUp className="size-4" /> Upload EOD
             </Button>
           </div>
+
         </div>
       </div>
     </Card>
