@@ -1,27 +1,40 @@
 import { useSyncExternalStore } from "react";
-import { eodReports as seedEod, schedules as seedSchedules } from "@/mock/data";
+import {
+  eodReports as seedEod,
+  schedules as seedSchedules,
+  scheduleApprovals as seedApprovals,
+  attendanceSummary as seedSummary,
+} from "@/mock/data";
 import { seedTokens, seedReferrals } from "@/mock/tokens";
-import type { EodReport, Schedule } from "@/mock/types";
+import type { EodReport, Schedule, ScheduleApproval, AttendanceSummary } from "@/mock/types";
 import type { Token, Referral } from "@/mock/tokens";
 
 type State = {
   eod: (EodReport & { reviewComment?: string })[];
   schedules: Schedule[];
+  approvals: ScheduleApproval[];
+  summary: AttendanceSummary[];
   tokens: Token[];
   referrals: Referral[];
 };
 
-const KEY = "cb.store.v1";
+const KEY = "cb.store.v2";
 
 function load(): State {
-  if (typeof window === "undefined") {
-    return { eod: seedEod, schedules: seedSchedules, tokens: seedTokens, referrals: seedReferrals };
-  }
+  const base: State = {
+    eod: seedEod,
+    schedules: seedSchedules,
+    approvals: seedApprovals,
+    summary: seedSummary,
+    tokens: seedTokens,
+    referrals: seedReferrals,
+  };
+  if (typeof window === "undefined") return base;
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) return { ...base, ...JSON.parse(raw) };
   } catch {}
-  return { eod: seedEod, schedules: seedSchedules, tokens: seedTokens, referrals: seedReferrals };
+  return base;
 }
 
 let state: State = load();
@@ -47,6 +60,20 @@ export const store = {
   addScheduleRequest: (s: Schedule) => { state = { ...state, schedules: [s, ...state.schedules] }; emit(); },
   updateSchedule: (id: string, patch: Partial<Schedule>) => {
     state = { ...state, schedules: state.schedules.map((s) => s.id === id ? { ...s, ...patch } : s) };
+    emit();
+  },
+  // Approvals
+  updateApproval: (id: string, patch: Partial<ScheduleApproval>) => {
+    state = { ...state, approvals: state.approvals.map((a) => a.id === id ? { ...a, ...patch } : a) };
+    emit();
+  },
+  bulkApproval: (ids: string[], status: "approved" | "rejected") => {
+    state = { ...state, approvals: state.approvals.map((a) => ids.includes(a.id) ? { ...a, status } : a) };
+    emit();
+  },
+  // Attendance summary
+  updateSummary: (id: string, patch: Partial<AttendanceSummary>) => {
+    state = { ...state, summary: state.summary.map((s) => s.id === id ? { ...s, ...patch } : s) };
     emit();
   },
   // Tokens
