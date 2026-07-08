@@ -59,15 +59,24 @@ export interface AttendanceRecord {
   status: AttendanceStatus;
 }
 
+export interface EodFile {
+  name: string;
+  size: number;
+  type: string;
+  dataUrl: string;
+}
+
 export interface EodReport {
   id: string;
   userId: string;
   clientId: string;
+  scheduleId?: string;
   date: string;
   summary: string;
   highlights: string[];
   blockers: string[];
   attachments: number;
+  files?: EodFile[];
   status: "submitted" | "reviewed" | "flagged";
 }
 
