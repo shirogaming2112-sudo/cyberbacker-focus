@@ -31,13 +31,15 @@ function LoginPage() {
 
   return (
     <div className="grid min-h-dvh grid-cols-1 lg:grid-cols-2">
-      <div className="relative hidden overflow-hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between lg:p-10">
+      <div className="relative hidden overflow-hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:p-12">
         <div className="pointer-events-none absolute inset-0 opacity-30">
           <div className="absolute -left-32 top-1/4 size-96 rounded-full bg-accent/40 blur-3xl" />
           <div className="absolute -right-24 bottom-0 size-96 rounded-full bg-accent/30 blur-3xl" />
         </div>
-        <img src={logoWhite.url} alt="Cyberbacker" className="relative h-10 w-auto" />
-        <div className="relative max-w-md space-y-4">
+        <div className="relative flex items-center">
+          <img src={logoWhite.url} alt="Cyberbacker" className="h-8 w-auto object-contain" />
+        </div>
+        <div className="relative mt-auto max-w-md space-y-4">
           <h1 className="font-display text-4xl font-semibold leading-tight">
             We've got your back.
           </h1>
@@ -46,7 +48,7 @@ function LoginPage() {
             for the entire Cyberbacker team.
           </p>
         </div>
-        <p className="relative text-xs text-primary-foreground/60">
+        <p className="relative mt-10 text-xs text-primary-foreground/60">
           © {new Date().getFullYear()} Cyberbacker. All rights reserved.
         </p>
       </div>
@@ -54,9 +56,9 @@ function LoginPage() {
       <div className="relative flex items-center justify-center bg-muted/40 p-6 sm:p-10">
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-accent/20 via-background to-background" />
         <div className="w-full max-w-md">
-          <div className="mb-6 flex items-center justify-center lg:hidden">
-            <img src={logoFull.url} alt="Cyberbacker" className="h-10 w-auto dark:hidden" />
-            <img src={logoWhite.url} alt="Cyberbacker" className="hidden h-10 w-auto dark:block" />
+          <div className="mb-6 flex items-center lg:hidden">
+            <img src={logoFull.url} alt="Cyberbacker" className="h-8 w-auto object-contain dark:hidden" />
+            <img src={logoWhite.url} alt="Cyberbacker" className="hidden h-8 w-auto object-contain dark:block" />
           </div>
           <div className="rounded-2xl border bg-card/80 p-6 shadow-card backdrop-blur sm:p-8">
             <div className="space-y-1.5">
