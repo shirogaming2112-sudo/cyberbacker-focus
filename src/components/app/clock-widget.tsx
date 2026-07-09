@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Play, Square, Coffee, FileUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -27,7 +27,11 @@ export function ClockWidget({
   className?: string;
   compact?: boolean;
 }) {
-  const schedules = useStore((s) => s.schedules.filter((x) => x.userId === "u_1" && x.status === "active"));
+  const allSchedules = useStore((s) => s.schedules);
+  const schedules = useMemo(
+    () => allSchedules.filter((x) => x.userId === "u_1" && x.status === "active"),
+    [allSchedules],
+  );
   const [mode, setMode] = useState<Mode>("idle");
   const [worked, setWorked] = useState(0);
   const [breakSec, setBreakSec] = useState(0);
