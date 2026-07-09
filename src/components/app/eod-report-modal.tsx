@@ -31,7 +31,8 @@ async function fileToDataUrl(file: File): Promise<string> {
 
 export function EodReportModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const today = new Date().toISOString().slice(0, 10);
-  const schedules = useStore((s) => s.schedules.filter((x) => x.userId === "u_1"));
+  const allSchedules = useStore((s) => s.schedules);
+  const schedules = useMemo(() => allSchedules.filter((x) => x.userId === "u_1"), [allSchedules]);
   const [clientId, setClientId] = useState(clients[0]?.id ?? "");
   const [scheduleId, setScheduleId] = useState<string>(schedules[0]?.id ?? "");
   const [date, setDate] = useState(today);
