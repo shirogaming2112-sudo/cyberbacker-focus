@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Calendar, Clock, FileText, Sparkles, TrendingUp, Users, ArrowRight } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Calendar, Clock, FileText, Sparkles, TrendingUp, Users, ArrowRight, Plane } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,10 @@ import { PageHeader } from "@/components/app/page-header";
 import { MetricCard } from "@/components/app/metric-card";
 import { ClockWidget } from "@/components/app/clock-widget";
 import { StatusBadge } from "@/components/app/status-badge";
+import { PtoRequestModal } from "@/components/app/pto-request-modal";
 import { activity, clients, currentUser, performance, schedules } from "@/mock/data";
+import { useStore } from "@/lib/mock-store";
+import { getPtoCredits } from "@/lib/pto";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Cyberbacker" }, { name: "description", content: "Your daily attendance and performance summary." }] }),
@@ -26,9 +29,19 @@ function Dashboard() {
   // Avoid SSR/client mismatch: render a stable string at first, then update client-side.
   const [greeting, setGreeting] = useState("Welcome");
   useEffect(() => { setGreeting(computeGreeting()); }, []);
+  const [ptoOpen, setPtoOpen] = useState(false);
 
   const activeSchedule = schedules.find((s) => s.status === "active");
   const client = clients.find((c) => c.id === activeSchedule?.clientId);
+
+  const ptoStatus = useStore((s) => s.ptoStatus);
+  const ptoRequests = useStore((s) => s.ptoRequests);
+  const myPto = useMemo(() => ptoRequests.filter((r) => r.userId === "u_1"), [ptoRequests]);
+  const credits = useMemo(() => getPtoCredits(myPto, ptoStatus), [myPto, ptoStatus]);
+  const approvedThisYear = useMemo(() => {
+    const y = String(new Date().getFullYear());
+    return myPto.filter((r) => r.status === "approved" && r.startDate.startsWith(y)).length;
+  }, [myPto]);
 
   return (
     <div className="space-y-5">
@@ -37,6 +50,9 @@ function Dashboard() {
         description="Here's what needs your attention today."
         actions={
           <>
+            <Button variant="outline" size="sm" onClick={() => setPtoOpen(true)}>
+              <Plane className="size-4" aria-hidden />Request PTO
+            </Button>
             <Button variant="outline" size="sm" asChild>
               <Link to="/eod-reports"><FileText className="size-4" aria-hidden />New EOD</Link>
             </Button>
@@ -76,6 +92,12 @@ function Dashboard() {
           <MetricCard label="Attendance %" value="96%" hint="last 30 days" icon={Users} trend={{ value: "+1.2", direction: "up" }} />
           <MetricCard label="Late Count" value="2" hint="this period" icon={Clock} trend={{ value: "-1", direction: "down" }} />
           <MetricCard label="Overtime Hours" value="3.5" hint="this month" icon={Sparkles} trend={{ value: "+0.5", direction: "up" }} />
+          <MetricCard
+            label="Approved PTO"
+            value={String(approvedThisYear)}
+            hint={`${credits.available} of ${credits.earned} credits available`}
+            icon={Plane}
+          />
         </div>
       </div>
 
@@ -123,6 +145,7 @@ function Dashboard() {
           </CardContent>
         </Card>
       </div>
+      <PtoRequestModal open={ptoOpen} onOpenChange={setPtoOpen} />
     </div>
   );
 }
