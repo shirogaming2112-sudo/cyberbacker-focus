@@ -29,9 +29,19 @@ function Dashboard() {
   // Avoid SSR/client mismatch: render a stable string at first, then update client-side.
   const [greeting, setGreeting] = useState("Welcome");
   useEffect(() => { setGreeting(computeGreeting()); }, []);
+  const [ptoOpen, setPtoOpen] = useState(false);
 
   const activeSchedule = schedules.find((s) => s.status === "active");
   const client = clients.find((c) => c.id === activeSchedule?.clientId);
+
+  const ptoStatus = useStore((s) => s.ptoStatus);
+  const ptoRequests = useStore((s) => s.ptoRequests);
+  const myPto = useMemo(() => ptoRequests.filter((r) => r.userId === "u_1"), [ptoRequests]);
+  const credits = useMemo(() => getPtoCredits(myPto, ptoStatus), [myPto, ptoStatus]);
+  const approvedThisYear = useMemo(() => {
+    const y = String(new Date().getFullYear());
+    return myPto.filter((r) => r.status === "approved" && r.startDate.startsWith(y)).length;
+  }, [myPto]);
 
   return (
     <div className="space-y-5">
@@ -40,6 +50,9 @@ function Dashboard() {
         description="Here's what needs your attention today."
         actions={
           <>
+            <Button variant="outline" size="sm" onClick={() => setPtoOpen(true)}>
+              <Plane className="size-4" aria-hidden />Request PTO
+            </Button>
             <Button variant="outline" size="sm" asChild>
               <Link to="/eod-reports"><FileText className="size-4" aria-hidden />New EOD</Link>
             </Button>
