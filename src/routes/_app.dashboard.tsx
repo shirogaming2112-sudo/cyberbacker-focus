@@ -92,6 +92,12 @@ function Dashboard() {
           <MetricCard label="Attendance %" value="96%" hint="last 30 days" icon={Users} trend={{ value: "+1.2", direction: "up" }} />
           <MetricCard label="Late Count" value="2" hint="this period" icon={Clock} trend={{ value: "-1", direction: "down" }} />
           <MetricCard label="Overtime Hours" value="3.5" hint="this month" icon={Sparkles} trend={{ value: "+0.5", direction: "up" }} />
+          <MetricCard
+            label="Approved PTO"
+            value={String(approvedThisYear)}
+            hint={`${credits.available} of ${credits.earned} credits available`}
+            icon={Plane}
+          />
         </div>
       </div>
 
