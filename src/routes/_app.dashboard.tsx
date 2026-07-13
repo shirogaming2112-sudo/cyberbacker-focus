@@ -145,6 +145,7 @@ function Dashboard() {
           </CardContent>
         </Card>
       </div>
+      <PtoRequestModal open={ptoOpen} onOpenChange={setPtoOpen} />
     </div>
   );
 }
