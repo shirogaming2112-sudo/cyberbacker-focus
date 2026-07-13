@@ -18,7 +18,7 @@ import { store, useStore } from "@/lib/mock-store";
 import { toast } from "sonner";
 import type { EodReport, EodFile } from "@/mock/types";
 
-const MAX_FILE_BYTES = 2 * 1024 * 1024; // 2 MB
+const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
 
 async function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -50,7 +50,7 @@ export function EodReportModal({ open, onOpenChange }: { open: boolean; onOpenCh
     if (!list) return;
     const next: EodFile[] = [];
     for (const f of Array.from(list)) {
-      if (f.size > MAX_FILE_BYTES) { toast.error(`${f.name} exceeds 2 MB`); continue; }
+      if (f.size > MAX_FILE_BYTES) { toast.error(`${f.name} exceeds 10 MB`); continue; }
       try {
         const dataUrl = await fileToDataUrl(f);
         next.push({ name: f.name, size: f.size, type: f.type || "application/octet-stream", dataUrl });
@@ -138,7 +138,7 @@ export function EodReportModal({ open, onOpenChange }: { open: boolean; onOpenCh
                 onChange={(e) => { onFilesPicked(e.target.files); e.currentTarget.value = ""; }}
               />
             </label>
-            <p className="mt-1 text-xs text-muted-foreground">Max 2 MB per file.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Max 10 MB per file.</p>
           </div>
           {files.length > 0 && (
             <ul className="mt-2 space-y-1.5">
