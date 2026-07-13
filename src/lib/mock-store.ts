@@ -6,6 +6,7 @@ import {
   attendanceSummary as seedSummary,
 } from "@/mock/data";
 import { seedTokens, seedReferrals } from "@/mock/tokens";
+import { seedPtoRequests, seedPtoStatus, type PtoRequest, type PtoStatus } from "@/mock/pto";
 import type { EodReport, Schedule, ScheduleApproval, AttendanceSummary } from "@/mock/types";
 import type { Token, Referral } from "@/mock/tokens";
 
@@ -16,9 +17,11 @@ type State = {
   summary: AttendanceSummary[];
   tokens: Token[];
   referrals: Referral[];
+  ptoStatus: PtoStatus;
+  ptoRequests: PtoRequest[];
 };
 
-const KEY = "cb.store.v2";
+const KEY = "cb.store.v3";
 
 function load(): State {
   const base: State = {
@@ -28,11 +31,16 @@ function load(): State {
     summary: seedSummary,
     tokens: seedTokens,
     referrals: seedReferrals,
+    ptoStatus: seedPtoStatus,
+    ptoRequests: seedPtoRequests,
   };
   if (typeof window === "undefined") return base;
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return { ...base, ...JSON.parse(raw) };
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") return { ...base, ...parsed };
+    }
   } catch {}
   return base;
 }
@@ -79,6 +87,12 @@ export const store = {
   // Tokens
   addToken: (t: Token) => { state = { ...state, tokens: [t, ...state.tokens] }; emit(); },
   deleteToken: (id: string) => { state = { ...state, tokens: state.tokens.filter((t) => t.id !== id) }; emit(); },
+  // PTO
+  addPtoRequest: (r: PtoRequest) => { state = { ...state, ptoRequests: [r, ...state.ptoRequests] }; emit(); },
+  updatePtoRequest: (id: string, patch: Partial<PtoRequest>) => {
+    state = { ...state, ptoRequests: state.ptoRequests.map((r) => r.id === id ? { ...r, ...patch } : r) };
+    emit();
+  },
 };
 
 export function useStore<T>(selector: (s: State) => T): T {
