@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Calendar, Clock, FileText, Sparkles, TrendingUp, Users, ArrowRight } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Calendar, Clock, FileText, Sparkles, TrendingUp, Users, ArrowRight, Plane } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,10 @@ import { PageHeader } from "@/components/app/page-header";
 import { MetricCard } from "@/components/app/metric-card";
 import { ClockWidget } from "@/components/app/clock-widget";
 import { StatusBadge } from "@/components/app/status-badge";
+import { PtoRequestModal } from "@/components/app/pto-request-modal";
 import { activity, clients, currentUser, performance, schedules } from "@/mock/data";
+import { useStore } from "@/lib/mock-store";
+import { getPtoCredits } from "@/lib/pto";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Cyberbacker" }, { name: "description", content: "Your daily attendance and performance summary." }] }),
