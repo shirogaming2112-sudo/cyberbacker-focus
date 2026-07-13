@@ -1,40 +1,58 @@
-## Goals
+## 1. Admin → User Attendance: scope by HB + pay-period date filter
 
-1. Make the login page logo look professional — smaller, left-aligned, with proper padding — instead of stretched to the top corner of the navy panel.
-2. Diagnose and fix the error thrown when opening the Dashboard.
+File: `src/routes/_app.admin.user-attendance.tsx`
 
-## 1. Login page — logo & panel layout
+- Read the current user from `useAuth()`. When their `appRole === "hb"`, restrict the User dropdown and the rows to users whose `headbacker` matches the logged-in HB's name. MB/Software keep the full list. Cyberbacker never reaches this route.
+- Add a **Pay period** select next to the User select with options:
+  - `1–15 (current month)`
+  - `16–end (current month)`
+  - `1–15 (previous month)`
+  - `16–end (previous month)`
+  - `All`
+- Filter `rows` by `date` falling inside the chosen half-month window (inclusive). CSV/Export button stays; it exports the filtered rows.
+- No changes to mock data shape.
 
-`src/routes/login.tsx` currently uses `lg:justify-between` on the navy panel with three direct children (logo, hero copy, copyright). That's what makes the logo "stretched apart" — it's pinned to the very top corner while the hero is far below it.
+## 2. PTO: credits, dashboard tile, and request modal
 
-Change the left panel structure to a proper padded frame:
+### Data model (mock only)
 
-- Wrap the panel content in a column with fixed top / middle / bottom regions, but pad the logo away from the edge instead of pinning it there.
-- Reduce the logo size from `h-10` to `h-8` and left-align it inside a padded header row (`px-2 py-1`) so it reads as a brand mark, not a hero image.
-- Increase panel padding from `lg:p-10` to `lg:p-12` and give the logo row its own `mb-auto` spacer so vertical rhythm stays balanced without the "stretched" gap.
-- Keep the hero copy vertically centered and the copyright pinned to the bottom.
-- Apply the same "smaller, left-aligned, padded" treatment to the mobile logo (`h-8`, `justify-start`, subtle left padding) so it matches the desktop feel.
+New file `src/mock/pto.ts` exporting:
+- `PtoStatus = "eligible" | "ineligible"`
+- `PtoRequest { id, userId, days, startDate, endDate, reason, status: "pending"|"approved"|"rejected", files?: EodFile[], createdAt }`
+- Seed: current user is `eligible`, a couple of seeded approved/pending requests for realism.
 
-No color, copy, or role-picker changes.
+Extend `src/lib/mock-store.ts` (bump key to `cb.store.v3`, keep the safe `{...base, ...parsed}` merge so old payloads don't crash):
+- State fields: `ptoStatus`, `ptoRequests`.
+- Actions: `addPtoRequest(r)`, `updatePtoRequest(id, patch)`.
 
-## 2. Dashboard error
+### Credit accrual rule (client-side derivation)
 
-The user reports "Error message shown" when opening `/dashboard`. Console logs and dev-server logs are clean, so the error is surfacing through the route's `errorComponent`. I need to reproduce it before editing.
+Helper `getPtoCredits(user, requests, status)` in `src/lib/pto.ts`:
+- If `status !== "eligible"` → `earned = 0`.
+- Otherwise `earned = number of completed quarters since Jan 1 of current year` (1 credit per quarter, capped at 4/year; simple `Math.floor((monthsSinceJan)/3) + 1` while eligible).
+- `used = sum of days from approved requests in the current year`.
+- `pending = sum of days from pending requests`.
+- `available = max(0, earned - used - pending)`.
 
-Steps:
+### Dashboard tile + request entry
 
-1. Drive Playwright against `http://localhost:8080/login`, click **Login as Cyberbacker**, wait for `/dashboard`, capture the rendered error text and any `pageerror` events, and screenshot the page.
-2. Based on the captured error, fix the offending code. The most likely suspects, in order:
-   - `ClockWidget` reads `schedules` from `useStore` and initializes `scheduleId` from `schedules[0]?.id` at render time — safe, but the select can end up with an empty string value which some shadcn `Select` versions reject. If that's the throw, guard the `<Select>` so it only renders when `schedules.length > 0` and show an inline "No active schedule — request one" hint otherwise.
-   - `_app.dashboard.tsx` derives `activeSchedule` from mock `schedules` and `client` from mock `clients`; both are optional-chained already, so unlikely to throw. If the error is here, add defensive fallbacks.
-   - Any stale `localStorage` value from an older store shape (`cb.store.v1`) surviving the `v2` migration. If the thrown error is a `TypeError` on `state.tokens`/`state.referrals`, harden `load()` in `src/lib/mock-store.ts` to wrap `JSON.parse` in a try/catch that discards non-object payloads and always merges over `base` (already the case, but confirm no missing keys).
-3. Re-run the Playwright repro after the fix, confirm `/dashboard` renders with no `pageerror`, and screenshot the final state.
+File: `src/routes/_app.dashboard.tsx`
+- Add an **Approved PTO** `MetricCard` in the metric grid showing count of approved requests this year, with hint `X days available`.
+- Add a **Request PTO** button in the `PageHeader` actions that opens a new `PtoRequestModal`.
+
+New component `src/components/app/pto-request-modal.tsx`:
+- Fields: number of days (1..available, disabled/blocked if `available === 0` with inline "No PTO credits available" message), start date (shadcn datepicker), reason (textarea, required), file upload (proof of client agreement, multi-file, **10MB max per file**, same base64 pattern as EOD).
+- Submit calls `store.addPtoRequest({ status: "pending", ... })`. Toast on success.
+
+### Unify file-upload cap to 10MB
+
+Bump the existing EOD attachment cap from 2MB to **10MB** in `src/components/app/eod-report-modal.tsx` (and its inline hint text) so all uploads share the same limit.
 
 ## Out of scope
-
-No changes to routes, permissions, mock data shape, admin surfaces, or backend spec. UI-only.
+- No admin PTO approval screen this pass (backend not wired). Requests persist in mock store and are visible via dashboard tile counts; approval UI can come next.
+- No changes to backend spec doc.
 
 ## Technical notes
-
-- Files touched: `src/routes/login.tsx`, and one of `src/components/app/clock-widget.tsx` / `src/routes/_app.dashboard.tsx` / `src/lib/mock-store.ts` depending on what the repro shows.
-- Verification: `tsgo` typecheck + Playwright smoke (login → dashboard, screenshot, assert no page errors).
+- Files touched: `src/routes/_app.admin.user-attendance.tsx`, `src/routes/_app.dashboard.tsx`, `src/lib/mock-store.ts`, `src/components/app/eod-report-modal.tsx`.
+- Files added: `src/mock/pto.ts`, `src/lib/pto.ts`, `src/components/app/pto-request-modal.tsx`.
+- Verification: `tsgo` typecheck + Playwright smoke — login as HB, confirm User Attendance list only shows their CBs and pay-period filter narrows rows; login as Cyberbacker, open dashboard, submit a PTO request, confirm tile updates.
