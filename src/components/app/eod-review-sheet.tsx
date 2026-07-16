@@ -34,6 +34,7 @@ export function EodReviewSheet({
   const author = users.find((u) => u.id === report.userId);
   const schedule = report.scheduleId ? allSchedules.find((s) => s.id === report.scheduleId) : undefined;
   const files = report.files ?? [];
+  const urlLinks = report.attachmentUrls ?? [];
 
   const decide = (status: "reviewed" | "flagged") => {
     store.reviewEod(report.id, status, comment.trim() || undefined);
