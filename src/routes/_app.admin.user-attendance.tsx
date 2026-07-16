@@ -151,8 +151,8 @@ function UserAttendance() {
       header: "Approval",
       cell: (r) => {
         const a = r.approvalStatus ?? "pending";
-        const tone = a === "approved" ? "success" : a === "rejected" ? "danger" : "warning";
-        return <StatusBadge tone={tone as "success" | "danger" | "warning"}>{a}</StatusBadge>;
+        const tone = a === "approved" ? "success" : a === "rejected" ? "destructive" : "warning";
+        return <StatusBadge tone={tone}>{a}</StatusBadge>;
       },
     },
     {
