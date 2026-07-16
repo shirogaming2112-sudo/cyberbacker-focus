@@ -4,10 +4,19 @@ import {
   schedules as seedSchedules,
   scheduleApprovals as seedApprovals,
   attendanceSummary as seedSummary,
+  attendance as seedAttendance,
+  changeLogs as seedChangeLogs,
 } from "@/mock/data";
 import { seedTokens, seedReferrals } from "@/mock/tokens";
 import { seedPtoRequests, seedPtoStatus, type PtoRequest, type PtoStatus } from "@/mock/pto";
-import type { EodReport, Schedule, ScheduleApproval, AttendanceSummary } from "@/mock/types";
+import type {
+  EodReport,
+  Schedule,
+  ScheduleApproval,
+  AttendanceSummary,
+  AttendanceRecord,
+  ChangeLog,
+} from "@/mock/types";
 import type { Token, Referral } from "@/mock/tokens";
 
 type State = {
@@ -15,13 +24,15 @@ type State = {
   schedules: Schedule[];
   approvals: ScheduleApproval[];
   summary: AttendanceSummary[];
+  attendance: AttendanceRecord[];
+  changeLogs: ChangeLog[];
   tokens: Token[];
   referrals: Referral[];
   ptoStatus: PtoStatus;
   ptoRequests: PtoRequest[];
 };
 
-const KEY = "cb.store.v3";
+const KEY = "cb.store.v4";
 
 function load(): State {
   const base: State = {
@@ -29,6 +40,8 @@ function load(): State {
     schedules: seedSchedules,
     approvals: seedApprovals,
     summary: seedSummary,
+    attendance: seedAttendance,
+    changeLogs: seedChangeLogs,
     tokens: seedTokens,
     referrals: seedReferrals,
     ptoStatus: seedPtoStatus,
@@ -55,6 +68,17 @@ function emit() {
   listeners.forEach((l) => l());
 }
 
+function nowIso() { return new Date().toISOString().slice(0, 10); }
+
+function logChangeInternal(entry: Omit<ChangeLog, "id" | "updatedAt">) {
+  const log: ChangeLog = {
+    id: `cl_${Math.random().toString(36).slice(2, 8)}`,
+    updatedAt: nowIso(),
+    ...entry,
+  };
+  state = { ...state, changeLogs: [log, ...state.changeLogs] };
+}
+
 export const store = {
   get: () => state,
   subscribe: (fn: () => void) => { listeners.add(fn); return () => listeners.delete(fn); },
@@ -66,8 +90,12 @@ export const store = {
   },
   // Schedules
   addScheduleRequest: (s: Schedule) => { state = { ...state, schedules: [s, ...state.schedules] }; emit(); },
-  updateSchedule: (id: string, patch: Partial<Schedule>) => {
-    state = { ...state, schedules: state.schedules.map((s) => s.id === id ? { ...s, ...patch } : s) };
+  updateSchedule: (id: string, patch: Partial<Schedule>, actor?: string) => {
+    const prev = state.schedules.find((s) => s.id === id);
+    state = { ...state, schedules: state.schedules.map((s) => s.id === id ? { ...s, ...patch, updatedAt: nowIso() } : s) };
+    if (prev && patch.status && patch.status !== prev.status) {
+      logChangeInternal({ userId: prev.userId, field: `Schedule · ${prev.name}`, from: prev.status, to: patch.status, updatedBy: actor ?? "System" });
+    }
     emit();
   },
   // Approvals
@@ -84,6 +112,44 @@ export const store = {
     state = { ...state, summary: state.summary.map((s) => s.id === id ? { ...s, ...patch } : s) };
     emit();
   },
+  // Attendance records
+  updateAttendance: (id: string, patch: Partial<AttendanceRecord>, actor: string) => {
+    const prev = state.attendance.find((a) => a.id === id);
+    if (!prev) return;
+    state = { ...state, attendance: state.attendance.map((a) => a.id === id ? { ...a, ...patch } : a) };
+    (Object.keys(patch) as (keyof AttendanceRecord)[]).forEach((k) => {
+      const from = prev[k];
+      const to = (patch as AttendanceRecord)[k];
+      if (String(from ?? "") !== String(to ?? "")) {
+        logChangeInternal({
+          userId: prev.userId,
+          field: `Attendance ${prev.date} · ${String(k)}`,
+          from: String(from ?? "—"),
+          to: String(to ?? "—"),
+          updatedBy: actor,
+        });
+      }
+    });
+    emit();
+  },
+  bulkAttendanceApproval: (ids: string[], status: "approved" | "rejected", actor: string) => {
+    const affected = state.attendance.filter((a) => ids.includes(a.id));
+    state = { ...state, attendance: state.attendance.map((a) => ids.includes(a.id) ? { ...a, approvalStatus: status } : a) };
+    affected.forEach((prev) => {
+      const from = prev.approvalStatus ?? "pending";
+      if (from !== status) {
+        logChangeInternal({
+          userId: prev.userId,
+          field: `Attendance ${prev.date} · approval`,
+          from,
+          to: status,
+          updatedBy: actor,
+        });
+      }
+    });
+    emit();
+  },
+  logChange: (entry: Omit<ChangeLog, "id" | "updatedAt">) => { logChangeInternal(entry); emit(); },
   // Tokens
   addToken: (t: Token) => { state = { ...state, tokens: [t, ...state.tokens] }; emit(); },
   deleteToken: (id: string) => { state = { ...state, tokens: state.tokens.filter((t) => t.id !== id) }; emit(); },
