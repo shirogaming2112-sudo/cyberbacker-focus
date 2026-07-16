@@ -176,6 +176,24 @@ export function EodReviewSheet({
           </section>
         )}
 
+        {urlLinks.length > 0 && (
+          <section>
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Cloud attachments</h3>
+            <ul className="mt-1 space-y-1.5">
+              {urlLinks.map((f, i) => (
+                <li key={i} className="flex items-center gap-2 rounded-md border bg-card px-2.5 py-1.5 text-sm">
+                  <FileText className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                  <span className="min-w-0 flex-1 truncate">{f.name}</span>
+                  {typeof f.size === "number" && <span className="text-xs text-muted-foreground tabular-nums">{(f.size / 1024).toFixed(0)} KB</span>}
+                  <a href={f.url} target="_blank" rel="noreferrer noopener" aria-label={`Open ${f.name}`} className="rounded p-1 hover:bg-muted">
+                    <Download className="size-4" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         <div>
           <Label htmlFor="eod-comment">Review comment (optional)</Label>
           <Textarea id="eod-comment" rows={3} value={comment} onChange={(e) => setComment(e.target.value)} className="mt-1.5" placeholder="Leave context for the cyberbacker…" />
