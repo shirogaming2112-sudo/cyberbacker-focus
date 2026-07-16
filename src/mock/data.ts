@@ -119,6 +119,9 @@ export const eodReports: EodReport[] = Array.from({ length: 8 }, (_, i) => ({
   highlights: ["Closed 4 lead intake forms", "Drafted next week's email sequence", "Resolved 2 client tickets"],
   blockers: i % 3 === 0 ? ["Waiting on copy approval"] : [],
   attachments: i % 2,
+  attachmentUrls: i === 1
+    ? [{ name: "weekly-report.pdf", url: "https://cbstorage.blob.core.windows.net/eod/weekly-report.pdf", type: "application/pdf", size: 245000 }]
+    : undefined,
   status: i === 0 ? "submitted" : i % 4 === 0 ? "flagged" : "reviewed",
 }));
 
