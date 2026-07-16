@@ -61,6 +61,7 @@ const adminNav: AdminItem[] = [
   { to: "/admin/eod-reports", label: "EOD Reviews", icon: FileText },
   { to: "/admin/user-attendance", label: "User Attendance", icon: ClipboardList },
   { to: "/admin/user-schedules", label: "User Schedules", icon: CalendarDays },
+  { to: "/admin/pto", label: "PTO Management", icon: CalendarCheck },
   { to: "/admin/change-logs", label: "Change Logs", icon: FileClock, requireChangeLogs: true },
   { to: "/admin/attendance-summary", label: "Attendance Summary", icon: BarChart3, requireSummary: true },
   { to: "/admin/users", label: "Users Management", icon: UsersIcon },
