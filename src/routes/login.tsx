@@ -4,8 +4,8 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { ROLE_DESCRIPTION, ROLE_LABEL, type AppRole } from "@/lib/permissions";
-import logoWhite from "@/assets/cyberbacker-white.png.asset.json";
-import logoFull from "@/assets/cyberbacker-full.png.asset.json";
+import logoWhite from "@/assets/cyberbacker-white.png";
+import logoFull from "@/assets/cyberbacker-full.png";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -37,7 +37,7 @@ function LoginPage() {
           <div className="absolute -right-24 bottom-0 size-96 rounded-full bg-accent/30 blur-3xl" />
         </div>
         <div className="relative flex items-center">
-          <img src={logoWhite.url} alt="Cyberbacker" className="h-8 w-auto object-contain" />
+          <img src={logoWhite} alt="Cyberbacker" className="h-8 w-auto object-contain" />
         </div>
         <div className="relative mt-auto max-w-md space-y-4">
           <h1 className="font-display text-4xl font-semibold leading-tight">
@@ -57,8 +57,8 @@ function LoginPage() {
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-accent/20 via-background to-background" />
         <div className="w-full max-w-md">
           <div className="mb-6 flex items-center lg:hidden">
-            <img src={logoFull.url} alt="Cyberbacker" className="h-8 w-auto object-contain dark:hidden" />
-            <img src={logoWhite.url} alt="Cyberbacker" className="hidden h-8 w-auto object-contain dark:block" />
+            <img src={logoFull} alt="Cyberbacker" className="h-8 w-auto object-contain dark:hidden" />
+            <img src={logoWhite} alt="Cyberbacker" className="hidden h-8 w-auto object-contain dark:block" />
           </div>
           <div className="rounded-2xl border bg-card/80 p-6 shadow-card backdrop-blur sm:p-8">
             <div className="space-y-1.5">

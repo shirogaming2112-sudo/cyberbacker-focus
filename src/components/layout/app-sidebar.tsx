@@ -83,15 +83,15 @@ export function AppSidebar() {
       <SidebarHeader className="border-b">
         <Link to="/dashboard" className="flex items-center gap-2 px-2 py-1.5" aria-label="Cyberbacker home">
           {collapsed ? (
-            <img src={logoMark.url} alt="" className="size-7 object-contain" />
+            <img src={logoMark} alt="" className="size-7 object-contain" />
           ) : (
             <>
               <img
-                src={resolvedTheme === "dark" ? logoWhite.url : logoFull.url}
+                src={resolvedTheme === "dark" ? logoWhite : logoFull}
                 alt=""
                 className="h-7 w-auto object-contain dark:hidden"
               />
-              <img src={logoWhite.url} alt="" className="hidden h-7 w-auto object-contain dark:block" />
+              <img src={logoWhite} alt="" className="hidden h-7 w-auto object-contain dark:block" />
             </>
           )}
         </Link>
