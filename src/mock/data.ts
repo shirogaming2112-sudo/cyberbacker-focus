@@ -42,24 +42,31 @@ const day = (d: number) => {
   return today.toISOString().slice(0, 10);
 };
 
-export const attendance: AttendanceRecord[] = Array.from({ length: 30 }, (_, i) => {
-  const status = i === 0 ? "pending" : i % 11 === 0 ? "late" : i % 13 === 0 ? "absent" : "present";
-  const worked = status === "absent" ? 0 : 7.5 + (i % 3) * 0.5;
-  return {
-    id: `a_${i}`,
-    userId: "u_1",
-    date: day(i),
-    clientId: clients[i % clients.length].id,
-    clockIn: status === "absent" ? null : "09:0" + (i % 6) + " AM",
-    clockOut: status === "absent" ? null : "05:1" + (i % 6) + " PM",
-    lunchHours: status === "absent" ? 0 : 1,
-    breakHours: status === "absent" ? 0 : 0.25,
-    hoursWorked: worked,
-    overtimeHours: i % 7 === 0 ? 1.25 : 0,
-    earlyInHours: i % 5 === 0 ? 0.25 : 0,
-    status,
-  };
-});
+const seedUserIds = ["u_1", "u_2", "u_3", "u_4"];
+export const attendance: AttendanceRecord[] = seedUserIds.flatMap((uid) =>
+  Array.from({ length: 20 }, (_, i) => {
+    const status = i === 0 ? "pending" : i % 11 === 0 ? "late" : i % 13 === 0 ? "absent" : "present";
+    const worked = status === "absent" ? 0 : 7.5 + (i % 3) * 0.5;
+    const overtime = i % 5 === 0 ? 1.25 : i % 7 === 0 ? 0.75 : 0;
+    const approvalStatus: "pending" | "approved" | "rejected" =
+      i < 3 ? "pending" : i % 9 === 0 ? "rejected" : "approved";
+    return {
+      id: `a_${uid}_${i}`,
+      userId: uid,
+      date: day(i),
+      clientId: clients[i % clients.length].id,
+      clockIn: status === "absent" ? null : "09:0" + (i % 6) + " AM",
+      clockOut: status === "absent" ? null : "05:1" + (i % 6) + " PM",
+      lunchHours: status === "absent" ? 0 : 1,
+      breakHours: status === "absent" ? 0 : 0.25,
+      hoursWorked: worked,
+      overtimeHours: overtime,
+      earlyInHours: i % 5 === 0 ? 0.25 : 0,
+      status,
+      approvalStatus,
+    };
+  }),
+);
 
 export const schedules: Schedule[] = [
   {
