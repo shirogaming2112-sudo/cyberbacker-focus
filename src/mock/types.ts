@@ -58,6 +58,15 @@ export interface AttendanceRecord {
   overtimeHours: number;
   earlyInHours: number;
   status: AttendanceStatus;
+  approvalStatus?: "pending" | "approved" | "rejected";
+  notes?: string;
+}
+
+export interface EodAttachmentLink {
+  name: string;
+  url: string;
+  size?: number;
+  type?: string;
 }
 
 export interface EodFile {
@@ -78,6 +87,7 @@ export interface EodReport {
   blockers: string[];
   attachments: number;
   files?: EodFile[];
+  attachmentUrls?: EodAttachmentLink[];
   status: "submitted" | "reviewed" | "flagged";
 }
 

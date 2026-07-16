@@ -38,9 +38,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { currentUser } from "@/mock/data";
 import { useAuth } from "@/lib/auth";
 import { can, ROLE_LABEL } from "@/lib/permissions";
-import logoFull from "@/assets/cyberbacker-full.png.asset.json";
-import logoMark from "@/assets/cyberbacker-mark.png.asset.json";
-import logoWhite from "@/assets/cyberbacker-white.png.asset.json";
+import logoFull from "@/assets/cyberbacker-full.png";
+import logoMark from "@/assets/cyberbacker-mark.png";
+import logoWhite from "@/assets/cyberbacker-white.png";
 
 const mainNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -61,6 +61,7 @@ const adminNav: AdminItem[] = [
   { to: "/admin/eod-reports", label: "EOD Reviews", icon: FileText },
   { to: "/admin/user-attendance", label: "User Attendance", icon: ClipboardList },
   { to: "/admin/user-schedules", label: "User Schedules", icon: CalendarDays },
+  { to: "/admin/pto", label: "PTO Management", icon: CalendarCheck },
   { to: "/admin/change-logs", label: "Change Logs", icon: FileClock, requireChangeLogs: true },
   { to: "/admin/attendance-summary", label: "Attendance Summary", icon: BarChart3, requireSummary: true },
   { to: "/admin/users", label: "Users Management", icon: UsersIcon },
@@ -83,15 +84,15 @@ export function AppSidebar() {
       <SidebarHeader className="border-b">
         <Link to="/dashboard" className="flex items-center gap-2 px-2 py-1.5" aria-label="Cyberbacker home">
           {collapsed ? (
-            <img src={logoMark.url} alt="" className="size-7 object-contain" />
+            <img src={logoMark} alt="" className="size-7 object-contain" />
           ) : (
             <>
               <img
-                src={resolvedTheme === "dark" ? logoWhite.url : logoFull.url}
+                src={resolvedTheme === "dark" ? logoWhite : logoFull}
                 alt=""
                 className="h-7 w-auto object-contain dark:hidden"
               />
-              <img src={logoWhite.url} alt="" className="hidden h-7 w-auto object-contain dark:block" />
+              <img src={logoWhite} alt="" className="hidden h-7 w-auto object-contain dark:block" />
             </>
           )}
         </Link>

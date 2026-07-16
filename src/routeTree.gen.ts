@@ -28,6 +28,7 @@ import { Route as AppAdminUsersRouteImport } from './routes/_app.admin.users'
 import { Route as AppAdminUserSchedulesRouteImport } from './routes/_app.admin.user-schedules'
 import { Route as AppAdminUserAttendanceRouteImport } from './routes/_app.admin.user-attendance'
 import { Route as AppAdminScheduleApprovalsRouteImport } from './routes/_app.admin.schedule-approvals'
+import { Route as AppAdminPtoRouteImport } from './routes/_app.admin.pto'
 import { Route as AppAdminEodReportsRouteImport } from './routes/_app.admin.eod-reports'
 import { Route as AppAdminChangeLogsRouteImport } from './routes/_app.admin.change-logs'
 import { Route as AppAdminAttendanceSummaryRouteImport } from './routes/_app.admin.attendance-summary'
@@ -127,6 +128,11 @@ const AppAdminScheduleApprovalsRoute =
     path: '/schedule-approvals',
     getParentRoute: () => AppAdminRoute,
   } as any)
+const AppAdminPtoRoute = AppAdminPtoRouteImport.update({
+  id: '/pto',
+  path: '/pto',
+  getParentRoute: () => AppAdminRoute,
+} as any)
 const AppAdminEodReportsRoute = AppAdminEodReportsRouteImport.update({
   id: '/eod-reports',
   path: '/eod-reports',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/admin/attendance-summary': typeof AppAdminAttendanceSummaryRoute
   '/admin/change-logs': typeof AppAdminChangeLogsRoute
   '/admin/eod-reports': typeof AppAdminEodReportsRoute
+  '/admin/pto': typeof AppAdminPtoRoute
   '/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/admin/user-attendance': typeof AppAdminUserAttendanceRoute
   '/admin/user-schedules': typeof AppAdminUserSchedulesRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/admin/attendance-summary': typeof AppAdminAttendanceSummaryRoute
   '/admin/change-logs': typeof AppAdminChangeLogsRoute
   '/admin/eod-reports': typeof AppAdminEodReportsRoute
+  '/admin/pto': typeof AppAdminPtoRoute
   '/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/admin/user-attendance': typeof AppAdminUserAttendanceRoute
   '/admin/user-schedules': typeof AppAdminUserSchedulesRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/_app/admin/attendance-summary': typeof AppAdminAttendanceSummaryRoute
   '/_app/admin/change-logs': typeof AppAdminChangeLogsRoute
   '/_app/admin/eod-reports': typeof AppAdminEodReportsRoute
+  '/_app/admin/pto': typeof AppAdminPtoRoute
   '/_app/admin/schedule-approvals': typeof AppAdminScheduleApprovalsRoute
   '/_app/admin/user-attendance': typeof AppAdminUserAttendanceRoute
   '/_app/admin/user-schedules': typeof AppAdminUserSchedulesRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/admin/attendance-summary'
     | '/admin/change-logs'
     | '/admin/eod-reports'
+    | '/admin/pto'
     | '/admin/schedule-approvals'
     | '/admin/user-attendance'
     | '/admin/user-schedules'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/admin/attendance-summary'
     | '/admin/change-logs'
     | '/admin/eod-reports'
+    | '/admin/pto'
     | '/admin/schedule-approvals'
     | '/admin/user-attendance'
     | '/admin/user-schedules'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/_app/admin/attendance-summary'
     | '/_app/admin/change-logs'
     | '/_app/admin/eod-reports'
+    | '/_app/admin/pto'
     | '/_app/admin/schedule-approvals'
     | '/_app/admin/user-attendance'
     | '/_app/admin/user-schedules'
@@ -427,6 +439,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminScheduleApprovalsRouteImport
       parentRoute: typeof AppAdminRoute
     }
+    '/_app/admin/pto': {
+      id: '/_app/admin/pto'
+      path: '/pto'
+      fullPath: '/admin/pto'
+      preLoaderRoute: typeof AppAdminPtoRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
     '/_app/admin/eod-reports': {
       id: '/_app/admin/eod-reports'
       path: '/eod-reports'
@@ -455,6 +474,7 @@ interface AppAdminRouteChildren {
   AppAdminAttendanceSummaryRoute: typeof AppAdminAttendanceSummaryRoute
   AppAdminChangeLogsRoute: typeof AppAdminChangeLogsRoute
   AppAdminEodReportsRoute: typeof AppAdminEodReportsRoute
+  AppAdminPtoRoute: typeof AppAdminPtoRoute
   AppAdminScheduleApprovalsRoute: typeof AppAdminScheduleApprovalsRoute
   AppAdminUserAttendanceRoute: typeof AppAdminUserAttendanceRoute
   AppAdminUserSchedulesRoute: typeof AppAdminUserSchedulesRoute
@@ -466,6 +486,7 @@ const AppAdminRouteChildren: AppAdminRouteChildren = {
   AppAdminAttendanceSummaryRoute: AppAdminAttendanceSummaryRoute,
   AppAdminChangeLogsRoute: AppAdminChangeLogsRoute,
   AppAdminEodReportsRoute: AppAdminEodReportsRoute,
+  AppAdminPtoRoute: AppAdminPtoRoute,
   AppAdminScheduleApprovalsRoute: AppAdminScheduleApprovalsRoute,
   AppAdminUserAttendanceRoute: AppAdminUserAttendanceRoute,
   AppAdminUserSchedulesRoute: AppAdminUserSchedulesRoute,
@@ -515,13 +536,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

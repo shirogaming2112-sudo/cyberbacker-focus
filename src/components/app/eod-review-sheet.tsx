@@ -34,6 +34,7 @@ export function EodReviewSheet({
   const author = users.find((u) => u.id === report.userId);
   const schedule = report.scheduleId ? allSchedules.find((s) => s.id === report.scheduleId) : undefined;
   const files = report.files ?? [];
+  const urlLinks = report.attachmentUrls ?? [];
 
   const decide = (status: "reviewed" | "flagged") => {
     store.reviewEod(report.id, status, comment.trim() || undefined);
@@ -169,6 +170,24 @@ export function EodReviewSheet({
                   <Button size="icon" variant="ghost" aria-label={`Download ${f.name}`} onClick={() => downloadFile(f.name, f.dataUrl)}>
                     <Download className="size-4" />
                   </Button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {urlLinks.length > 0 && (
+          <section>
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Cloud attachments</h3>
+            <ul className="mt-1 space-y-1.5">
+              {urlLinks.map((f, i) => (
+                <li key={i} className="flex items-center gap-2 rounded-md border bg-card px-2.5 py-1.5 text-sm">
+                  <FileText className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                  <span className="min-w-0 flex-1 truncate">{f.name}</span>
+                  {typeof f.size === "number" && <span className="text-xs text-muted-foreground tabular-nums">{(f.size / 1024).toFixed(0)} KB</span>}
+                  <a href={f.url} target="_blank" rel="noreferrer noopener" aria-label={`Open ${f.name}`} className="rounded p-1 hover:bg-muted">
+                    <Download className="size-4" />
+                  </a>
                 </li>
               ))}
             </ul>
