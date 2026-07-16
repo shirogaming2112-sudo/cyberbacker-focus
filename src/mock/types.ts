@@ -87,6 +87,7 @@ export interface EodReport {
   blockers: string[];
   attachments: number;
   files?: EodFile[];
+  attachmentUrls?: EodAttachmentLink[];
   status: "submitted" | "reviewed" | "flagged";
 }
 
