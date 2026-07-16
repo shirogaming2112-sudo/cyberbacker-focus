@@ -38,9 +38,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { currentUser } from "@/mock/data";
 import { useAuth } from "@/lib/auth";
 import { can, ROLE_LABEL } from "@/lib/permissions";
-import logoFull from "@/assets/cyberbacker-full.png.asset.json";
-import logoMark from "@/assets/cyberbacker-mark.png.asset.json";
-import logoWhite from "@/assets/cyberbacker-white.png.asset.json";
+import logoFull from "@/assets/cyberbacker-full.png";
+import logoMark from "@/assets/cyberbacker-mark.png";
+import logoWhite from "@/assets/cyberbacker-white.png";
 
 const mainNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
