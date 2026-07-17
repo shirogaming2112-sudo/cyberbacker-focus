@@ -124,15 +124,25 @@ function UserAttendance() {
   const cols: Column<Row>[] = [
     {
       key: "sel",
-      header: "",
-      cell: (r) => (
+      header: (
         <Checkbox
-          checked={selected.has(r.id)}
-          onCheckedChange={(v) => toggle(r.id, !!v)}
-          disabled={(r.approvalStatus ?? "pending") !== "pending"}
-          aria-label={`Select ${r.userName} ${r.date}`}
+          checked={pendingIds.length > 0 && allSelected ? true : selected.size > 0 ? "indeterminate" : false}
+          onCheckedChange={(v) => toggleAll(!!v)}
+          aria-label="Select all pending attendance rows"
+          disabled={pendingIds.length === 0}
         />
-      ),
+      ) as unknown as string,
+      cell: (r) => {
+        const pending = (r.approvalStatus ?? "pending") === "pending";
+        return (
+          <Checkbox
+            checked={selected.has(r.id)}
+            onCheckedChange={(v) => toggle(r.id, !!v)}
+            disabled={!pending}
+            aria-label={`Select ${r.userName} attendance for ${r.date}`}
+          />
+        );
+      },
     },
     { key: "user", header: "User", cell: (r) => <span className="font-medium">{r.userName}</span> },
     { key: "date", header: "Date", cell: (r) => r.date },
@@ -167,11 +177,13 @@ function UserAttendance() {
       cell: (r) => {
         const pending = (r.approvalStatus ?? "pending") === "pending";
         return (
-          <div className="flex justify-end gap-2">
+          <div role="group" aria-label={`Approval actions for ${r.userName} on ${r.date}`} className="flex justify-end gap-2">
             <Button
               size="sm"
               variant="outline"
               disabled={!pending}
+              aria-disabled={!pending}
+              aria-label={`Disapprove ${r.userName} attendance for ${r.date}`}
               onClick={() => {
                 store.updateAttendance(r.id, { approvalStatus: "rejected" }, actor);
                 store.logChange({ userId: r.userId, field: `Attendance ${r.date} · approval`, from: r.approvalStatus ?? "pending", to: "rejected", updatedBy: actor });
@@ -183,6 +195,8 @@ function UserAttendance() {
             <Button
               size="sm"
               disabled={!pending}
+              aria-disabled={!pending}
+              aria-label={`Approve ${r.userName} attendance for ${r.date}`}
               onClick={() => {
                 store.updateAttendance(r.id, { approvalStatus: "approved" }, actor);
                 store.logChange({ userId: r.userId, field: `Attendance ${r.date} · approval`, from: r.approvalStatus ?? "pending", to: "approved", updatedBy: actor });
