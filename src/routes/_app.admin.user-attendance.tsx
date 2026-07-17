@@ -124,14 +124,7 @@ function UserAttendance() {
   const cols: Column<Row>[] = [
     {
       key: "sel",
-      header: (
-        <Checkbox
-          checked={pendingIds.length > 0 && allSelected ? true : selected.size > 0 ? "indeterminate" : false}
-          onCheckedChange={(v) => toggleAll(!!v)}
-          aria-label="Select all pending attendance rows"
-          disabled={pendingIds.length === 0}
-        />
-      ) as unknown as string,
+      header: "",
       cell: (r) => {
         const pending = (r.approvalStatus ?? "pending") === "pending";
         return (
