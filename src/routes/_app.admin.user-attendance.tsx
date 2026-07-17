@@ -233,15 +233,53 @@ function UserAttendance() {
         }
       />
 
-      <div className="flex flex-wrap items-center gap-2 rounded-md border bg-card px-3 py-2 text-xs">
+      <div
+        role="region"
+        aria-label="Attendance bulk actions"
+        aria-keyshortcuts="A D"
+        onKeyDown={(e) => {
+          if (!selected.size) return;
+          if (e.target instanceof HTMLElement && ["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
+          if (e.key === "a" || e.key === "A") { e.preventDefault(); bulk("approved"); }
+          else if (e.key === "d" || e.key === "D") { e.preventDefault(); bulk("rejected"); }
+        }}
+        className="flex flex-wrap items-center gap-2 rounded-md border bg-card px-3 py-2 text-xs"
+      >
         <label className="flex items-center gap-1.5 text-muted-foreground">
-          <Checkbox checked={allSelected} onCheckedChange={(v) => toggleAll(!!v)} aria-label="Select all pending" />
-          Select all pending
+          <Checkbox
+            checked={pendingIds.length > 0 && allSelected ? true : selected.size > 0 ? "indeterminate" : false}
+            onCheckedChange={(v) => toggleAll(!!v)}
+            disabled={pendingIds.length === 0}
+            aria-label="Select all pending attendance rows"
+          />
+          Select all pending ({pendingIds.length})
         </label>
-        <Badge variant="secondary">{selected.size} selected</Badge>
-        <div className="ml-auto flex gap-2">
-          <Button size="sm" variant="outline" disabled={!selected.size} onClick={() => bulk("rejected")}>Bulk Disapprove</Button>
-          <Button size="sm" disabled={!selected.size} onClick={() => bulk("approved")}>Bulk Approve</Button>
+        <Badge variant="secondary" aria-live="polite">{selected.size} selected</Badge>
+        <span className="sr-only" aria-live="polite">
+          {selected.size ? `${selected.size} record${selected.size === 1 ? "" : "s"} selected. Press A to approve or D to disapprove.` : ""}
+        </span>
+        <div className="ml-auto flex gap-2" role="group" aria-label="Bulk decision">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={!selected.size}
+            aria-disabled={!selected.size}
+            aria-keyshortcuts="D"
+            aria-label={`Bulk disapprove ${selected.size} selected record${selected.size === 1 ? "" : "s"}`}
+            onClick={() => bulk("rejected")}
+          >
+            Bulk Disapprove
+          </Button>
+          <Button
+            size="sm"
+            disabled={!selected.size}
+            aria-disabled={!selected.size}
+            aria-keyshortcuts="A"
+            aria-label={`Bulk approve ${selected.size} selected record${selected.size === 1 ? "" : "s"}`}
+            onClick={() => bulk("approved")}
+          >
+            Bulk Approve
+          </Button>
         </div>
       </div>
 
