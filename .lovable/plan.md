@@ -1,65 +1,63 @@
-## 1. Admin → User Attendance: bulk actions, per-row approve, overtime edit, change logs
+## 1. Admin PTO — CSV import with success/failure rows
 
-File: `src/routes/_app.admin.user-attendance.tsx` and `src/mock/types.ts`, `src/lib/mock-store.ts`, `src/mock/data.ts`.
+File: `src/routes/_app.admin.pto.tsx` (+ small helper `src/lib/pto-import.ts`).
 
-- Extend `AttendanceRecord` with `approvalStatus: "pending" | "approved" | "disapproved"` and `notes?: string`. Seed some rows as `pending`.
-- Add per-row checkbox column plus "Select all pending" and **Bulk Approve / Bulk Disapprove** buttons in `PageHeader` actions, matching the pattern already used on Schedule Approvals.
-- Add per-row **Approve** / **Disapprove** buttons (disabled once decided) and a **Notes** popover (same style as `NotesCell` on Schedule Approvals).
-- Show an **Overtime** column (`overtimeHours` from the record) with a badge when > 0 and make it editable via a small popover (number input, 0–8h).
-- Make the **Status** column editable via a Select (`present / late / absent / leave / pending`).
-- Every edit (status, overtime, approval, notes) writes a `ChangeLog` row via a new `store.logAttendanceChange(record, field, from, to, updatedByName)` action. Existing `/admin/change-logs` page already renders `ChangeLog[]` — extend the store's `changeLogs` slice (currently seeded from `src/mock/data.ts`) so admin edits appear at the top with original → edited value and the current user's name (from `useAuth()`).
-- Bulk actions also emit one change-log row per affected record.
+- Replace the current "queue file" toast with a real POST to `/api/admin/pto/import` (FastAPI target). Since the backend isn't wired yet, gate the URL behind `import.meta.env.VITE_API_BASE_URL`; when unset, fall back to a local mock parser that reads the CSV client-side and produces the same result shape so the UI is fully testable offline.
+- Expected response shape (documented in the PDF too):
+  ```json
+  { "processed": 12, "succeeded": [{"row":2,"userEmail":"...","status":"eligible","credits":3}],
+    "failed": [{"row":5,"userEmail":"...","error":"User not found"}] }
+  ```
+- Add an `ImportResultDialog` (inline, not a new file) that opens after upload and shows two tabs: **Succeeded** (green check, row #, user, applied change) and **Failed** (red, row #, raw values, error). Include a "Download failed rows as CSV" button for retry.
+- Apply the succeeded rows optimistically to the store (update `ptoStatus` per user once the store supports per-user status; for now log a `ChangeLog` entry per succeeded row via `store.logChange`).
+- Show a loading state on the Import button while the request is in-flight; handle network errors with a toast + retry.
 
-## 2. Admin → User Schedules: working Edit + inline Approve/Disapprove
+## 2. Admin User Attendance — keyboard + SR-friendly bulk actions
 
-File: `src/routes/_app.admin.user-schedules.tsx`.
+File: `src/routes/_app.admin.user-attendance.tsx` and the shared `NotesCell` / overtime popover components.
 
-- Replace the placeholder Edit button with an `EditScheduleSheet` (new component under `src/components/app/`) reusing the day-grid pattern from `ScheduleRequestModal`. On save it calls `store.updateSchedule(id, patch)` and logs the change to change logs.
-- Add inline **Approve** / **Disapprove** buttons in the Actions column that flip `status` between `active` and `rejected`, disabled once decided, and emit change-log rows.
-- No new routes.
+- **Select-all-pending checkbox**: give it `aria-label="Select all pending attendance rows"` and an `aria-checked` "mixed" state when a partial selection exists. Ensure it's a real `<Checkbox>` reachable via Tab, toggleable with Space.
+- **Row checkboxes**: `aria-label={`Select ${userName} attendance for ${date}`}`. Keep them in tab order; Space toggles.
+- **Per-row Approve / Disapprove buttons**: add `aria-label` including user + date + action, and `aria-disabled` (not just `disabled`) when already decided so screen readers announce state. Wrap the action pair in a `role="group"` with an `aria-label="Approval actions"`.
+- **Notes popover trigger**: `aria-label` includes whether a note exists ("Edit note" vs "Add note"); popover content gets `role="dialog"` + `aria-labelledby`; textarea has a visible label associated via `htmlFor`. Cmd/Ctrl+Enter saves, Esc closes.
+- **Overtime popover**: same dialog pattern; number input labelled "Overtime hours (0–8)"; `aria-describedby` points at a hint line. Enter saves, Esc cancels.
+- **Bulk action bar**: appears when selection > 0 with `role="region"` + `aria-live="polite"` announcing "N rows selected"; Approve/Disapprove buttons have descriptive `aria-label`s.
+- **Focus management**: after bulk action or per-row decision, return focus to the triggering control (or the next row's checkbox if the row is now decided). After closing a popover, focus returns to its trigger.
+- **Keyboard shortcuts on the table**: `A` approves, `D` disapproves selected rows when the bulk bar has focus (documented via `aria-keyshortcuts`).
+- No visual redesign — only a11y wiring and a small bulk-action bar that already exists in the header moves inline above the table when selection > 0 so it's discoverable by keyboard users.
 
-## 3. Admin → PTO Management (new page)
+## 3. Admin PTO — per-request Approve / Disapprove with change logs
 
-New route: `src/routes/_app.admin.pto.tsx`, plus sidebar entry in `src/components/layout/app-sidebar.tsx` (admin section, gated to HB/MB/Software, HB scoped to their CBs like User Attendance).
+File: `src/routes/_app.admin.pto.tsx`, uses existing `store.updatePtoRequest` + `store.logChange`.
 
-- Table: one row per user (scoped by role) with columns User · Status (`eligible/ineligible`, editable via Select for MB/Software) · Earned · Used · Pending · Available · Pending Requests count · Actions.
-- Uses `getPtoCredits` from `src/lib/pto.ts` per user (extend it to accept any user id).
-- Click a row → side sheet lists that user's `PtoRequest`s with per-request **Approve** / **Disapprove** buttons wired to `store.updatePtoRequest`. Approvals reduce Available automatically because `getPtoCredits` sums approved days.
-- **Export CSV** button downloads the list (user, status, earned, used, pending, available, request counts).
-- **Import** button opens a file picker that accepts `.csv` / `.xlsx` and, for now, stores the selected filename + a toast "Sent to backend (mock)" — the real POST target will be documented in the endpoint PDF (see §6). No parsing.
+- In the side-sheet request list, add **Approve** and **Disapprove** buttons on each pending request (disabled once decided, `aria-disabled` for SR clarity).
+- On click: call `store.updatePtoRequest(id, { status })` and immediately `store.logChange({ userId, field: `PTO ${startDate}→${endDate} (${days}d)`, from: prev.status, to: newStatus, updatedBy: currentUserName })`.
+- Show a confirmation toast; refresh the credits row automatically because `getPtoCredits` already reacts to store changes.
+- Add a small "Approve all pending" secondary action at the top of the request list for that user (bulk within one user's sheet), logging one change entry per request.
+- Keyboard/SR: buttons grouped with `role="group"` + `aria-label="Decision"`; announce result via `aria-live` region inside the sheet.
 
-## 4. EOD Review: show Azure-hosted files
+## 4. Backend endpoints PDF — polished, complete
 
-Files: `src/mock/types.ts`, `src/mock/data.ts`, `src/components/app/eod-review-sheet.tsx`, `src/components/app/eod-report-modal.tsx`.
+File: `/mnt/documents/cyberbacker-backend-endpoints.pdf` (versioned `_v2` if regenerating).
 
-- Extend `EodFile` with optional `url?: string` (Azure blob URL) so backend-returned files can be represented as `{ name, size, type, url }` without a `dataUrl`. Locally uploaded files keep `dataUrl`.
-- In `EodReviewSheet` attachments list, if the file has `url`, the Download button opens the Azure link in a new tab; images with a `url` render an `<img>` preview inline; JSON/text files render a "View" link.
-- Seed one existing EOD with a couple of Azure-style URL files so the review UI can be verified end-to-end offline.
-- PDF export continues to work: for `url`-only files it lists the URL under Attachments instead of embedding.
-
-## 5. Assets: real PNGs for offline testing
-
-Files: `src/assets/*.asset.json` (3 files), any importers.
-
-- Download the three CDN-hosted logos (`cyberbacker-full.png`, `cyberbacker-mark.png`, `cyberbacker-white.png`) from their `.asset.json` URLs into `src/assets/` as real PNG files.
-- Keep the `.asset.json` pointers **and** the PNGs so production still uses CDN; update the small number of import sites (login page, sidebar, top header) to import the `.png` directly so the images render when the CDN is unreachable (offline testing).
-- No behaviour change online.
-
-## 6. Backend endpoint PDF
-
-- Generate `/mnt/documents/cyberbacker-backend-endpoints.pdf` using ReportLab (Platypus, DejaVu Sans registered for accents, US Letter, TOC-style headings).
-- Structure: Intro → Auth (Google SSO + session) → Users & Roles → Clients → Schedules & Schedule Approvals → Attendance (incl. bulk approve, overtime edits, change logs) → EOD Reports (multipart upload → Azure Blob, list, review, PDF export) → PTO (list, credits, request, approve, import/export) → Tokens & Referrals (GHL webhook) → Change Logs → Notifications.
-- Each endpoint entry: method + path, purpose, role permissions, request payload shape (JSON example matching current mock shapes in `src/mock/types.ts`), response payload, and error cases.
-- Include a short "DB tables touched" note per endpoint referencing the schema in `docs/backend-spec.md`.
-- Emit a `<presentation-artifact>` link when done.
-- QA pass: convert every page to JPEG at 150 DPI, inspect for overflow / clipped tables / font-box glyphs; iterate until clean.
+- Generate with ReportLab Platypus, US Letter, DejaVu Sans registered (accents-safe), branded cover page (Cyberbacker mark from `src/assets`), TOC, and page numbers.
+- Sections, in order:
+  1. Overview & conventions (base URL, auth header, error envelope, pagination, timestamps).
+  2. Auth — Google SSO exchange, session refresh, logout.
+  3. Users & Roles — list (scoped), get, create/update, password, impersonate (Software only), headbacker assignment.
+  4. Clients.
+  5. Schedules & Schedule Approvals (bulk approve/disapprove, notes).
+  6. Attendance — list (HB scope + pay-period filter), edit status/notes/overtime, bulk approve/disapprove, change-log emission rules.
+  7. EOD Reports — multipart upload to Azure Blob, list, review (approve/flag), PDF export, attachment link listing.
+  8. **PTO** — list credits per user, credit computation rules, request create, per-request approve/disapprove, **CSV import (multipart) with success/failure row response shape from §1**, CSV export.
+  9. Tokens & Referrals — create/revoke, GHL webhook contract.
+  10. Change Logs — list with filters; write rules (server also logs bulk actions).
+  11. Notifications.
+- Each endpoint entry includes: `METHOD /path`, purpose, role permissions matrix, request payload (JSON example matching `src/mock/types.ts`), success response, error responses, and "DB tables touched" cross-referencing `docs/backend-spec.md`.
+- QA: render every page to JPEG at 150 DPI, inspect for overflow/clipping/font-box glyphs, iterate until clean; then emit `<presentation-artifact>`.
 
 ## Technical notes
 
-Files touched: `src/routes/_app.admin.user-attendance.tsx`, `src/routes/_app.admin.user-schedules.tsx`, `src/mock/types.ts`, `src/mock/data.ts`, `src/lib/mock-store.ts`, `src/lib/pto.ts`, `src/components/app/eod-review-sheet.tsx`, `src/components/app/eod-report-modal.tsx`, `src/components/layout/app-sidebar.tsx`, plus login/topbar image imports.
-
-Files added: `src/routes/_app.admin.pto.tsx`, `src/components/app/edit-schedule-sheet.tsx`, `src/components/app/attendance-notes-cell.tsx` (small helper), three real PNGs under `src/assets/`, and the generated PDF under `/mnt/documents/`.
-
-Mock-store bump: `cb.store.v4` (keeps `{...base, ...parsed}` merge). New action: `logAttendanceChange`, plus attendance approval/notes/overtime setters.
-
-Verification: `tsgo` typecheck, Playwright smoke — sign in as MB, bulk-approve 3 attendance rows, edit overtime on one, confirm change-logs page lists all four entries with before/after; open Admin → PTO, export CSV, import a dummy file; open an EOD with an Azure URL file and confirm the link opens. Screenshot each.
+Files touched: `src/routes/_app.admin.pto.tsx`, `src/routes/_app.admin.user-attendance.tsx`, small helper `src/lib/pto-import.ts`.
+Files added: none beyond the helper and the PDF under `/mnt/documents/`.
+No store-shape changes (still `cb.store.v4`). Verification: `tsgo`, plus Playwright — import a sample CSV and confirm the result dialog splits succeeded/failed; keyboard-drive attendance selection + bulk approve; approve a pending PTO request and confirm it appears in `/admin/change-logs`.

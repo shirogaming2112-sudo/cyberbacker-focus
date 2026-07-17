@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -125,14 +125,17 @@ function UserAttendance() {
     {
       key: "sel",
       header: "",
-      cell: (r) => (
-        <Checkbox
-          checked={selected.has(r.id)}
-          onCheckedChange={(v) => toggle(r.id, !!v)}
-          disabled={(r.approvalStatus ?? "pending") !== "pending"}
-          aria-label={`Select ${r.userName} ${r.date}`}
-        />
-      ),
+      cell: (r) => {
+        const pending = (r.approvalStatus ?? "pending") === "pending";
+        return (
+          <Checkbox
+            checked={selected.has(r.id)}
+            onCheckedChange={(v) => toggle(r.id, !!v)}
+            disabled={!pending}
+            aria-label={`Select ${r.userName} attendance for ${r.date}`}
+          />
+        );
+      },
     },
     { key: "user", header: "User", cell: (r) => <span className="font-medium">{r.userName}</span> },
     { key: "date", header: "Date", cell: (r) => r.date },
@@ -167,11 +170,13 @@ function UserAttendance() {
       cell: (r) => {
         const pending = (r.approvalStatus ?? "pending") === "pending";
         return (
-          <div className="flex justify-end gap-2">
+          <div role="group" aria-label={`Approval actions for ${r.userName} on ${r.date}`} className="flex justify-end gap-2">
             <Button
               size="sm"
               variant="outline"
               disabled={!pending}
+              aria-disabled={!pending}
+              aria-label={`Disapprove ${r.userName} attendance for ${r.date}`}
               onClick={() => {
                 store.updateAttendance(r.id, { approvalStatus: "rejected" }, actor);
                 store.logChange({ userId: r.userId, field: `Attendance ${r.date} · approval`, from: r.approvalStatus ?? "pending", to: "rejected", updatedBy: actor });
@@ -183,6 +188,8 @@ function UserAttendance() {
             <Button
               size="sm"
               disabled={!pending}
+              aria-disabled={!pending}
+              aria-label={`Approve ${r.userName} attendance for ${r.date}`}
               onClick={() => {
                 store.updateAttendance(r.id, { approvalStatus: "approved" }, actor);
                 store.logChange({ userId: r.userId, field: `Attendance ${r.date} · approval`, from: r.approvalStatus ?? "pending", to: "approved", updatedBy: actor });
@@ -226,15 +233,53 @@ function UserAttendance() {
         }
       />
 
-      <div className="flex flex-wrap items-center gap-2 rounded-md border bg-card px-3 py-2 text-xs">
+      <div
+        role="region"
+        aria-label="Attendance bulk actions"
+        aria-keyshortcuts="A D"
+        onKeyDown={(e) => {
+          if (!selected.size) return;
+          if (e.target instanceof HTMLElement && ["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
+          if (e.key === "a" || e.key === "A") { e.preventDefault(); bulk("approved"); }
+          else if (e.key === "d" || e.key === "D") { e.preventDefault(); bulk("rejected"); }
+        }}
+        className="flex flex-wrap items-center gap-2 rounded-md border bg-card px-3 py-2 text-xs"
+      >
         <label className="flex items-center gap-1.5 text-muted-foreground">
-          <Checkbox checked={allSelected} onCheckedChange={(v) => toggleAll(!!v)} aria-label="Select all pending" />
-          Select all pending
+          <Checkbox
+            checked={pendingIds.length > 0 && allSelected ? true : selected.size > 0 ? "indeterminate" : false}
+            onCheckedChange={(v) => toggleAll(!!v)}
+            disabled={pendingIds.length === 0}
+            aria-label="Select all pending attendance rows"
+          />
+          Select all pending ({pendingIds.length})
         </label>
-        <Badge variant="secondary">{selected.size} selected</Badge>
-        <div className="ml-auto flex gap-2">
-          <Button size="sm" variant="outline" disabled={!selected.size} onClick={() => bulk("rejected")}>Bulk Disapprove</Button>
-          <Button size="sm" disabled={!selected.size} onClick={() => bulk("approved")}>Bulk Approve</Button>
+        <Badge variant="secondary" aria-live="polite">{selected.size} selected</Badge>
+        <span className="sr-only" aria-live="polite">
+          {selected.size ? `${selected.size} record${selected.size === 1 ? "" : "s"} selected. Press A to approve or D to disapprove.` : ""}
+        </span>
+        <div className="ml-auto flex gap-2" role="group" aria-label="Bulk decision">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={!selected.size}
+            aria-disabled={!selected.size}
+            aria-keyshortcuts="D"
+            aria-label={`Bulk disapprove ${selected.size} selected record${selected.size === 1 ? "" : "s"}`}
+            onClick={() => bulk("rejected")}
+          >
+            Bulk Disapprove
+          </Button>
+          <Button
+            size="sm"
+            disabled={!selected.size}
+            aria-disabled={!selected.size}
+            aria-keyshortcuts="A"
+            aria-label={`Bulk approve ${selected.size} selected record${selected.size === 1 ? "" : "s"}`}
+            onClick={() => bulk("approved")}
+          >
+            Bulk Approve
+          </Button>
         </div>
       </div>
 
@@ -245,9 +290,10 @@ function UserAttendance() {
 
 function OvertimeCell({ row, actor }: { row: Row; actor: string }) {
   const [v, setV] = useState(String(row.overtimeHours));
+  const hintId = `ot-hint-${row.id}`;
   const commit = () => {
     const n = Number(v);
-    if (!Number.isFinite(n) || n < 0) { setV(String(row.overtimeHours)); return; }
+    if (!Number.isFinite(n) || n < 0 || n > 8) { setV(String(row.overtimeHours)); toast.error("Overtime must be 0–8 hours"); return; }
     if (n === row.overtimeHours) return;
     store.updateAttendance(row.id, { overtimeHours: n }, actor);
     toast.success("Overtime updated");
@@ -258,38 +304,76 @@ function OvertimeCell({ row, actor }: { row: Row; actor: string }) {
         type="number"
         step="0.25"
         min={0}
+        max={8}
         value={v}
         onChange={(e) => setV(e.target.value)}
         onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") { e.preventDefault(); (e.target as HTMLInputElement).blur(); }
+          else if (e.key === "Escape") { setV(String(row.overtimeHours)); (e.target as HTMLInputElement).blur(); }
+        }}
         aria-label={`Overtime hours for ${row.userName} on ${row.date}`}
+        aria-describedby={hintId}
         className="h-8 w-20 tabular-nums"
       />
-      {row.overtimeHours > 0 && <Badge variant="secondary" className="text-[10px]">OT</Badge>}
+      <span id={hintId} className="sr-only">Enter a value from 0 to 8 hours. Press Enter to save or Escape to cancel.</span>
+      {row.overtimeHours > 0 && <Badge variant="secondary" className="text-[10px]" aria-label="Has overtime">OT</Badge>}
     </div>
   );
 }
 
 function NotesCell({ row, actor }: { row: Row; actor: string }) {
+  const [open, setOpen] = useState(false);
   const [value, setValue] = useState(row.notes ?? "");
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const labelId = `notes-label-${row.id}`;
+  const save = () => {
+    store.updateAttendance(row.id, { notes: value.trim() || undefined }, actor);
+    toast.success("Note saved");
+    setOpen(false);
+  };
+  useEffect(() => { if (!open) setValue(row.notes ?? ""); }, [open, row.notes]);
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button size="sm" variant="outline" className="h-7 gap-1.5 font-normal">
+        <Button
+          ref={triggerRef}
+          size="sm"
+          variant="outline"
+          className="h-7 gap-1.5 font-normal"
+          aria-label={`${row.notes ? "Edit" : "Add"} note for ${row.userName} on ${row.date}`}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+        >
           <StickyNote className="size-3" aria-hidden />
           {row.notes ? "Edit" : "Add note"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-72">
-        <Label className="text-xs">Notes</Label>
+      <PopoverContent
+        className="w-72"
+        role="dialog"
+        aria-labelledby={labelId}
+        onKeyDown={(e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); save(); }
+        }}
+      >
+        <Label id={labelId} htmlFor={`notes-ta-${row.id}`} className="text-xs">
+          Note for {row.userName} · {row.date}
+        </Label>
         <Textarea
+          id={`notes-ta-${row.id}`}
           rows={3}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Add a note for this attendance record…"
           className="mt-1.5"
+          aria-describedby={`notes-hint-${row.id}`}
         />
+        <p id={`notes-hint-${row.id}`} className="mt-1 text-[11px] text-muted-foreground">
+          Press Ctrl/Cmd+Enter to save, Escape to close.
+        </p>
         <div className="mt-2 flex justify-end">
-          <Button size="sm" onClick={() => { store.updateAttendance(row.id, { notes: value.trim() || undefined }, actor); toast.success("Note saved"); }}>Save</Button>
+          <Button size="sm" onClick={save} aria-label={`Save note for ${row.userName} on ${row.date}`}>Save</Button>
         </div>
       </PopoverContent>
     </Popover>
